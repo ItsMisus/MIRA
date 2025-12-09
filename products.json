@@ -1,106 +1,115 @@
 [
-  {
-    "name": "Gaming Beast RTX 4070",
-    "price": 799,
-    "desc": "PC Gaming potente con Ryzen 7, 16GB RAM, RTX 4070 per prestazioni eccezionali.",
-    "img": "https://via.placeholder.com/300x200?text=Gaming+Beast+RTX+4070",
-    "components": "Ryzen 7 5700X | 16GB DDR4 | RTX 4070 | SSD 1TB NVMe",
+ {
+    "name": "Kraken Elite",
+    "price": 849,
+    "desc": "PC Gaming potente con Ryzen 7 di ultima generazione, 32GB RAM, RTX 4070 Ti e SSD ultraveloce da 1TB.",
+    "img": "https://breunor.com/cdn/shop/files/rgb_336b3060-f6f0-496f-9bcd-606ab680b4c4.jpg?v=1762785752&width=700",
+    "components": "Ryzen 7 7700X | 32GB DDR5 | RTX 4070 Ti | SSD 1TB NVMe | RGB Case",
     "category": "bestseller"
-  },
-  {
-    "name": "Ultimate Gaming Station",
-    "price": 1099,
-    "discountPrice": 999,
+},
+
+ {
+    "name": "Cobra",
+    "price": 1149,
+    "discountPrice": 1049,
     "discount": true,
-    "desc": "PC Gaming top di gamma con Intel i7, 32GB RAM, RTX 4070 Ti.",
-    "img": "https://via.placeholder.com/300x200?text=Ultimate+Gaming+Station",
-    "components": "Intel i7-12700K | 32GB DDR5 | RTX 4070 Ti | SSD 2TB NVMe",
+    "desc": "PC Gaming potente con Intel i7 di ultima generazione, 32GB RAM DDR5, RTX 4070 Ti e SSD veloce da 2TB.",
+    "img": "https://breunor.com/cdn/shop/files/rosso_27e43620-d674-419b-8d8f-4ca4763fd521.jpg?v=1752938797&width=700",
+    "components": "Intel i7-13700K | 32GB DDR5 | RTX 4070 Ti | SSD 2TB NVMe | RGB Case",
     "category": "offerte"
-  },
-  {
-    "name": "Pro Gamer RTX 4080",
-    "price": 1299,
-    "desc": "Configurazione professionale con Ryzen 9, 32GB RAM, RTX 4080.",
-    "img": "https://via.placeholder.com/300x200?text=Pro+Gamer+RTX+4080",
-    "components": "Ryzen 9 5900X | 32GB DDR4 | RTX 4080 | SSD 2TB NVMe",
+},
+
+ {
+    "name": "Nova",
+    "price": 1399,
+    "desc": "Configurazione top per gaming e streaming: Ryzen 9 di ultima generazione, 64GB RAM, RTX 4080 Ti, SSD ultraveloce da 2TB.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "Ryzen 9 7950X | 64GB DDR5 | RTX 4080 Ti | SSD 2TB NVMe | Liquid Cooling",
     "category": "pronta-consegna"
-  },
-  {
-    "name": "Budget Gaming Starter",
-    "price": 599,
-    "discountPrice": 549,
+},
+
+ {
+    "name": "Apex",
+    "price": 629,
+    "discountPrice": 579,
     "discount": true,
-    "desc": "PC Gaming entry-level perfetto per iniziare, con Intel i5, 16GB RAM, RTX 3060.",
-    "img": "https://via.placeholder.com/300x200?text=Budget+Gaming+Starter",
-    "components": "Intel i5-12400F | 16GB DDR4 | RTX 3060 | SSD 512GB",
+    "desc": "Perfetto per iniziare a giocare: Intel i5 di nuova generazione, 16GB RAM, RTX 3060 Ti, SSD veloce da 1TB.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "Intel i5-13400F | 16GB DDR4 | RTX 3060 Ti | SSD 1TB NVMe",
     "category": "console-killer"
-  },
-  {
-    "name": "Essential Gaming PC",
-    "price": 499,
-    "desc": "Soluzione economica con Ryzen 5, 16GB RAM, GTX 1660.",
-    "img": "https://via.placeholder.com/300x200?text=Essential+Gaming+PC",
-    "components": "Ryzen 5 5600G | 16GB DDR4 | GTX 1660 | SSD 500GB",
+},
+
+{
+    "name": "Vortex",
+    "price": 3499,
+    "desc": "Perfetto per gaming entry-level: Ryzen 5, 16GB RAM, RTX 3050, SSD veloce da 1TB.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "PC Gaming i9 14900K | RTX 5080 16GB | Ram 32Gb RGB DDR5 6800MHz | SSD NVMe 2TB Gen.5 | AIO 360mm",
     "category": "bestseller"
-  },
-  {
-    "name": "Extreme Gaming RTX 4090",
-    "price": 2499,
-    "desc": "Il massimo delle prestazioni: Intel i9, 64GB RAM, RTX 4090.",
-    "img": "https://via.placeholder.com/300x200?text=Extreme+Gaming+RTX+4090",
-    "components": "Intel i9-12900K | 64GB DDR5 | RTX 4090 | SSD 4TB NVMe",
+},
+
+{
+    "name": "Phantom",
+    "price": 2699,
+    "desc": "Prestazioni estreme con Intel i9 di ultima generazione, 128GB RAM e RTX 4090, perfetto per gaming e rendering 4K.",
+    "img": "https://breunor.com/cdn/shop/files/rgb_410e1ca3-370d-4d15-acc5-e88f2547853a.png?v=1752936673&width=300",
+    "components": "Intel i9-14900K | 128GB DDR5 | RTX 4090 | SSD 4TB NVMe | Liquid Cooling",
     "category": "pronta-consegna"
-  },
-  {
-    "name": "White Edition Gaming",
-    "price": 899,
-    "desc": "Design elegante tutto bianco con RGB, Ryzen 7, 16GB RAM, RTX 4060 Ti.",
-    "img": "https://via.placeholder.com/300x200?text=White+Edition+Gaming",
-    "components": "Ryzen 7 5800X | 16GB DDR4 | RTX 4060 Ti | SSD 1TB | Case White RGB",
+},
+
+{
+    "name": "Nebula",
+    "price": 1749,
+    "desc": "Eleganza e prestazioni elevate, Ryzen 9, 32GB RAM, RTX 4070 Ti, con illuminazione RGB personalizzabile.",
+    "img": "https://breunor.com/cdn/shop/files/viola_08bfaf10-bbfe-47e2-8eaf-6075e1dede1a.jpg?v=1762766561&width=700",
+    "components": "Ryzen 9 7900X | 32GB DDR5 | RTX 4070 Ti | SSD 2TB NVMe | Case White RGB",
     "category": "white"
-  },
+},
+
+ {
+    "name": "RTX 5000 Series Titan",
+    "price": 1999,
+    "desc": "Potenza massima con RTX 5080, perfetto per gaming e creazione contenuti.",
+    "img": "https://breunor.com/cdn/shop/files/WHITEFRAME4000DIGD.width-1000.format-webp-Photoroom.png?v=1764241077&width=300",
+    "components": "AMD Ryzen 9 7950X | 64GB DDR5 | RTX 5080 | SSD 4TB NVMe",
+    "category": "white || rx5000"  
+}, 
   {
-    "name": "RTX 5000 Series Beast",
-    "price": 1899,
-    "desc": "Nuova generazione con RTX 5070, prestazioni da urlo.",
-    "img": "https://via.placeholder.com/300x200?text=RTX+5000+Series+Beast",
-    "components": "Intel i7-14700K | 32GB DDR5 | RTX 5070 | SSD 2TB NVMe",
-    "category": "rtx5000"
-  },
-  {
-    "name": "Radeon RX 9000 Gaming",
+    "name": "Pulse",
     "price": 1699,
     "desc": "Potenza AMD con RX 9070, ideale per gaming in 4K.",
-    "img": "https://via.placeholder.com/300x200?text=Radeon+RX+9000+Gaming",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
     "components": "Ryzen 9 7950X | 32GB DDR5 | RX 9070 | SSD 2TB NVMe",
     "category": "rx9000"
   },
-  {
-    "name": "Custom Build Pro",
-    "price": 999,
-    "discountPrice": 899,
+{
+    "name": "Shadow",
+    "price": 1049,
+    "discountPrice": 949,
     "discount": true,
-    "desc": "Configurazione personalizzabile, scegli i tuoi componenti!",
-    "img": "https://via.placeholder.com/300x200?text=Custom+Build+Pro",
-    "components": "Configurazione personalizzata a scelta del cliente",
+    "desc": "Configurazione personalizzabile di fascia alta: scegli CPU, GPU, RAM e storage per creare il tuo PC perfetto.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "Configurazione completamente personalizzata a scelta del cliente",
     "category": "personalizzati"
-  },
-  {
-    "name": "Console Killer Elite",
-    "price": 699,
-    "desc": "Prestazioni superiori alle console next-gen a prezzo accessibile.",
-    "img": "https://via.placeholder.com/300x200?text=Console+Killer+Elite",
-    "components": "Ryzen 5 7600X | 16GB DDR5 | RTX 4060 | SSD 1TB",
+},
+
+{
+    "name": "Ignite",
+    "price": 749,
+    "desc": "Prestazioni superiori alle console next-gen, con Ryzen 5 di ultima generazione, 16GB RAM, RTX 4060 Ti e SSD veloce da 1TB.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "Ryzen 5 7600X | 16GB DDR5 | RTX 4060 Ti | SSD 1TB NVMe | RGB Case",
     "category": "console-killer"
-  },
+},
   {
-    "name": "Weekly Deal Gaming",
-    "price": 849,
-    "discountPrice": 749,
+    "name": "Onyx",
+    "price": 879,
+    "discountPrice": 779,
     "discount": true,
-    "desc": "Offerta della settimana! PC gaming completo con ottimo rapporto qualità-prezzo.",
-    "img": "https://via.placeholder.com/300x200?text=Weekly+Deal+Gaming",
-    "components": "Intel i5-13600K | 16GB DDR5 | RTX 4060 Ti | SSD 1TB",
+    "desc": "Offerta della settimana! PC Gaming performante con Intel i5 di nuova generazione, 16GB RAM DDR5, RTX 4060 Ti e SSD veloce da 1TB.",
+    "img": "https://breunor.com/cdn/shop/files/rossa_7b01eaf6-eb4f-45b2-9437-c00d4b4dc97d.jpg?v=1765271046&width=700",
+    "components": "Intel i5-14600K | 16GB DDR5 | RTX 4060 Ti | SSD 1TB NVMe | RGB Case",
     "category": "offerte"
-  }
+}
+
 ]
