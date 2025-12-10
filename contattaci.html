@@ -6,37 +6,41 @@
     <title>Contattaci - MISUSTECH</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
-    <!-- Carica il sistema di lingue PRIMA di tutto -->
+    
+    <!-- New Optimization Systems -->
+    <script src="storage.js"></script>
+    <script src="file-upload.js"></script>
     <script src="languages.js"></script>
+    <script src="utilities.js"></script>
 </head>
 <body>
     <!-- Main -->
     <main>
         <div class="contact-page" id="contact">
-            <h1 data-i18n="contactPageTitle">Contattaci</h1>
+            <h1>Contattaci</h1>
             
             <form class="contact-form" id="contactForm">
                 <div class="form-group">
-                    <label for="nome" data-i18n="contactName">Nome:</label>
+                    <label for="nome">Nome:</label>
                     <input type="text" id="nome" name="nome" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="cognome" data-i18n="contactSurname">Cognome:</label>
+                    <label for="cognome">Cognome:</label>
                     <input type="text" id="cognome" name="cognome" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="email" data-i18n="contactEmail">Email:</label>
-                    <input type="email" id="email" name="email" placeholder="Es. esempio@email.com" data-i18n-placeholder="contactEmailPlaceholder" required>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" placeholder="Es. esempio@email.com" required>
                 </div>
                 
                 <div class="form-group">
-                    <label for="messaggio" data-i18n="contactMessage">Corpo del Messaggio:</label>
+                    <label for="messaggio">Corpo del Messaggio:</label>
                     <textarea id="messaggio" name="messaggio" required></textarea>
                 </div>
                 
-                <button type="submit" data-i18n="contactSubmit">Invia ora</button>
+                <button type="submit">Invia ora</button>
             </form>
         </div>
     </main>
@@ -45,16 +49,16 @@
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h3 data-i18n="whoWeAre">Chi Siamo</h3>
+                <h3>Chi Siamo</h3>
                 <ul>
-                    <li><a href="chisiamo.html" data-i18n="ourStory">La nostra storia</a></li>
-                    <li><a href="contattaci.html" data-i18n="contactPageLink">Contattaci</a></li>
-                    <li><a href="discord.html" data-i18n="discordCommunity">Community Discord</a></li>
+                    <li><a href="chisiamo.html">La nostra storia</a></li>
+                    <li><a href="contattaci.html">Contattaci</a></li>
+                    <li><a href="discord.html">Community Discord</a></li>
                 </ul>
             </div>
 
             <div class="footer-section">
-                <h3 data-i18n="legalInfo">Informazioni Legali</h3>
+                <h3>Informazioni Legali</h3>
                 <p><strong>MISUSTECH s.r.l.</strong></p>
                 <p>Partita IVA: <strong>IT01234567890</strong></p>
                 <p>Via Roma 123, 76121<br>Barletta (BA) - Italia</p>
@@ -62,68 +66,35 @@
             </div>
 
             <div class="footer-section">
-                <h3 data-i18n="support">Supporto</h3>
+                <h3>Supporto</h3>
                 <ul>
-                    <li><a href="contattaci.html" data-i18n="contactPageLink">Contatti</a></li>
-                    <li><a href="custom-pc.html" data-i18n="createPC">Crea PC Custom</a></li>
-                    <li><a href="pcgaming.html" data-i18n="completeCatalog">Catalogo Completo</a></li>
+                    <li><a href="contattaci.html">Contatti</a></li>
+                    <li><a href="custom-pc.html">Crea PC Custom</a></li>
+                    <li><a href="pcgaming.html">Catalogo Completo</a></li>
                 </ul>
             </div>
         </div>
 
-        <p data-i18n="allRightsReserved">© 2025 MISUSTECH | Tutti i diritti riservati</p>
+        <p>© 2025 MISUSTECH | Tutti i diritti riservati</p>
     </footer>
 
     <!-- Script -->
     <script src="script.js"></script>
-    <script src="components.js"></script>
     <script>
-        // Applica le traduzioni quando il DOM è pronto
-        document.addEventListener('DOMContentLoaded', function() {
-            initLanguageSystem();
-        });
-
-        // Gestione del form di contatto
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('contactForm');
-            if(form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    const nome = document.getElementById('nome').value;
-                    const cognome = document.getElementById('cognome').value;
-                    const email = document.getElementById('email').value;
-                    const messaggio = document.getElementById('messaggio').value;
-                    
-                    // Invia i dati al server PHP
-                    fetch('send-contact.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            nome: nome,
-                            cognome: cognome,
-                            email: email,
-                            messaggio: messaggio
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(`Grazie ${nome}! Il tuo messaggio è stato inviato con successo.\n\nTi contatteremo al più presto.`);
-                            form.reset();
-                        } else {
-                            alert(`Errore: ${data.message}`);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Errore nella comunicazione con il server. Riprova più tardi.');
-                        console.error('Error:', error);
-                    });
-                });
-            }
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const telefono = document.getElementById('telefono').value;
+            const messaggio = document.getElementById('messaggio').value;
+            
+            alert(`Grazie ${nome}! Il tuo messaggio è stato inviato.\n\nTi contatteremo al numero ${telefono} al più presto.`);
+            
+            this.reset();
         });
     </script>
+<script src="languages.js"></script>
+<script src="components.js"></script>
 </body>
 </html>

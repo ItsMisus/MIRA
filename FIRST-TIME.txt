@@ -1,0 +1,215 @@
+🎮 PANNELLO ADMIN MISUSTECH - PRIMO ACCESSO
+═══════════════════════════════════════════════════════════════════════════════
+
+APRI QUESTO FILE NEL BROWSER PER SEGUIRE VISUALMENTE TUTTI I STEP!
+
+URL:
+http://localhost/misustech/QUICKSTART.html
+
+Oppure accedi direttamente:
+http://localhost/misustech/admin.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 PRIMA VOLTA? SEGUI QUESTI STEP
+
+STEP 1: Vai a setup (apri nel browser)
+────────────────────────────────────────────────────────────────────────────────
+http://localhost/misustech/QUICKSTART.html
+
+Vedrai una pagina con 6 card e uno stra-grande bottone "APRI PANNELLO ADMIN"
+
+STEP 2: Clicca su "Setup Iniziale"
+────────────────────────────────────────────────────────────────────────────────
+Clicca il bottone "⚙️ SETUP INIZIALE"
+
+Ti porterà a: setup-admin.html
+
+STEP 3: Esegui migrazione
+────────────────────────────────────────────────────────────────────────────────
+Vedrai dei step:
+1. Verifica File ✓ (clicca il bottone)
+2. Esegui Migrazione ✓ (clicca il bottone)
+3. Accedi al Pannello ✓ (clicca il bottone)
+
+STEP 4: Migrazione nel browser
+────────────────────────────────────────────────────────────────────────────────
+Ti aparirà una pagina di migrazione:
+http://localhost/misustech/migrate-browser.html
+
+Vedrai:
+- Una log box con messaggi
+- Un bottone "Scarica products.json"
+
+Clicca SCARICA!
+
+STEP 5: Sostituisci il file
+────────────────────────────────────────────────────────────────────────────────
+Vai nella cartella: C:\Users\gigio\Desktop\MisusTech
+
+Troverai un file: products.json
+
+Sostituiscilo con il file scaricato dal browser
+(Fai backup del vecchio PRIMA!)
+
+STEP 6: Accedi al pannello
+────────────────────────────────────────────────────────────────────────────────
+Ora apri nel browser:
+http://localhost/misustech/admin.html
+
+FATTO! ✅ Sei dentro il pannello admin!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 COSA PUOI FARE ADESSO
+
+TAB 1: GESTIONE PC
+──────────────────────────────────────────────────────────────────────────────
+Compila i campi:
+  • Nome PC
+  • Prezzo
+  • Prezzo Scontato (opzionale - sistema calcola % da solo!)
+  • Descrizione
+  • Componenti
+  • URL Immagine
+  • Categorie (click "Aggiungi" per più categorie!)
+  • Tag Visivi
+
+Clicca "💾 Salva Nuovo PC"
+
+Vedrai subito il PC nella tabella sottostante!
+
+TAB 2: CATEGORIE
+──────────────────────────────────────────────────────────────────────────────
+Crea nuove categorie:
+  • Nome (es. "gaming-pro")
+  • Colore (scegli dal color picker)
+  • Descrizione
+
+Vedrai tutte le categorie nella tabella
+
+TAB 3: TAG VISIVI
+──────────────────────────────────────────────────────────────────────────────
+Crea nuovi tag:
+  • Nome (es. "Super Offerta")
+  • Icona/Emoji (es. 🎁)
+  • Colore
+  • Descrizione
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 ESEMPIO PRATICO: AGGIUNGERE UN PC IN OFFERTA
+
+1. Apri admin.html
+
+2. Compila questi campi:
+   Nome PC: "Kraken Elite Plus"
+   Prezzo: 899
+   Prezzo Scontato: 799
+   Descrizione: "Il nostro PC più venduto..."
+   Componenti: "Ryzen 7 | 32GB DDR5 | RTX 4070 Ti"
+   URL Immagine: https://...jpg
+   
+3. Aggiungi categorie:
+   - bestseller
+   - pronta-consegna
+   
+4. Aggiungi tag:
+   - Hot Deal
+
+5. Clicca "💾 Salva Nuovo PC"
+
+6. BOOM! Appare nella tabella con:
+   - Prezzo barrato: €899
+   - Prezzo sconto: €799
+   - Badge "Hot Deal": 🔥
+   - Categorie: bestseller, pronta-consegna
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ ERRORI COMUNI
+
+"API non risponde"
+→ Verifica che admin-api.php sia nella cartella
+→ Apri F12 → Console per vedere l'errore
+
+"Prodotti non caricano"
+→ Esegui migrate-browser.html per convertire i dati
+→ Controlla che products.json sia valido
+
+"Non riesco a salvare"
+→ Verifica che tutti i campi obbligatori siano riempiti
+→ Controlla permessi di scrittura della cartella
+→ Su Windows spesso serve disabilitare antivirus
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 LEGGI LA DOCUMENTAZIONE COMPLETA
+
+Se hai dubbi, leggi:
+
+README-ADMIN.md
+→ Guida completa con tutti i dettagli
+
+ADMIN-GUIDE.txt
+→ Guida rapida di riferimento
+
+IMPLEMENTAZIONE-ADMIN.md
+→ Dettagli tecnici per sviluppatori
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 PRIMO ACCESSO CHECKLIST
+
+□ Ho aperto admin.html
+□ Carica correttamente (vedo i 3 tab)
+□ Vedo i PC esistenti nella tabella
+□ Riesco a compilare il form
+□ Riesco a salvare un nuovo PC
+□ Il PC appare nella tabella
+□ Riesco a modificare un PC (click "Modifica")
+□ Riesco a eliminare un PC (click "Elimina")
+□ Riesco a creare una categoria
+□ Riesco a creare un tag
+
+Se tutto funziona: ✅ PRONTO A PARTIRE!
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎮 SCORCIATOIE RAPIDE
+
+Apri admin.html direttamente:
+http://localhost/misustech/admin.html
+
+Vedi una guida visuale:
+http://localhost/misustech/QUICKSTART.html
+
+Leggi documentazione:
+README-ADMIN.md (nel file manager)
+
+Vedi esempio di integrazione:
+http://localhost/misustech/example-products-display.html
+
+═══════════════════════════════════════════════════════════════════════════════
+
+❓ HAI DOMANDE?
+
+Email: misustech@gmail.com
+
+Oppure leggi i file di documentazione:
+- README-ADMIN.md (completa)
+- ADMIN-GUIDE.txt (rapida)
+- FILE-INDEX.txt (lista file)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎉 PRONTO? INIZIA ADESSO!
+
+http://localhost/misustech/admin.html
+
+O per la guida visuale:
+
+http://localhost/misustech/QUICKSTART.html
+
+═══════════════════════════════════════════════════════════════════════════════
+Buona amministrazione! 🚀

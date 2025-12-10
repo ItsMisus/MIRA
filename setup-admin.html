@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurazione Admin - MISUSTECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            font-family: 'Rajdhani', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .setup-container {
+            background: #1f1f1f;
+            border: 2px solid #9b59b6;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #9b59b6;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .setup-steps {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .step {
+            background: #2d2d2d;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #9b59b6;
+        }
+
+        .step h3 {
+            color: #9b59b6;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 5px;
+            color: #27ae60;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #9b59b6;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #b86ec9;
+        }
+
+        .btn-secondary {
+            background: #34495e;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #425d6e;
+        }
+
+        .status {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .status.success {
+            background: #27ae60;
+            color: #fff;
+        }
+
+        .status.warning {
+            background: #f39c12;
+            color: #fff;
+        }
+
+        .status.error {
+            background: #e74c3c;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <h1>⚙️ Setup Admin Panel</h1>
+
+        <div class="setup-steps">
+            <div class="step">
+                <h3>1️⃣ Verifica File</h3>
+                <p>I seguenti file devono essere presenti nella cartella:</p>
+                <div class="code">
+admin.html<br>admin.js<br>admin-api.php<br>admin-categories.json<br>admin-tags.json
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>2️⃣ Migra i Prodotti</h3>
+                <p>Esegui lo script di migrazione una sola volta:</p>
+                <div class="code">
+http://localhost/misustech/migrate.php
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9rem;">Questo convertirà i prodotti al nuovo formato.</p>
+            </div>
+
+            <div class="step">
+                <h3>3️⃣ Accedi al Pannello</h3>
+                <p>Apri il pannello admin da questo link:</p>
+                <div class="code">
+http://localhost/misustech/admin.html
+                </div>
+            </div>
+
+            <div class="step">
+                <h3>📌 Funzionalità</h3>
+                <p>✅ Aggiungi/Modifica/Elimina PC<br>
+                   ✅ Gestisci categorie multiple per PC<br>
+                   ✅ Crea tag visivi (Best Seller, Hot Deal, ecc)<br>
+                   ✅ Gestisci sconti e prezzi<br>
+                   ✅ Carica immagini via URL<br>
+                   ✅ Paginazione automatica (6 PC per pagina)
+                </p>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="checkFiles()">✅ Verifica File</button>
+            <button class="btn btn-primary" onclick="goToMigration()">🔄 Esegui Migrazione</button>
+            <button class="btn btn-primary" onclick="goToAdmin()">🎮 Vai al Pannello Admin</button>
+            <a href="index.html" class="btn btn-secondary">← Torna al Sito</a>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function checkFiles() {
+            const requiredFiles = [
+                'admin.html',
+                'admin.js',
+                'admin-api.php',
+                'admin-categories.json',
+                'admin-tags.json'
+            ];
+
+            const statusDiv = document.getElementById('status');
+            let allExists = true;
+
+            // Fai una richiesta semplice per verificare
+            fetch('admin-api.php?action=getAll')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        statusDiv.innerHTML = '<div class="status success">✅ Tutti i file sono presenti e il server è pronto!</div>';
+                    } else {
+                        statusDiv.innerHTML = '<div class="status warning">⚠️ Alcuni file potrebbero essere mancanti</div>';
+                    }
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = '<div class="status error">❌ Errore: Assicurati che i file siano nella cartella corretta</div>';
+                });
+        }
+
+        function goToMigration() {
+            window.location.href = 'migrate.php';
+        }
+
+        function goToAdmin() {
+            window.location.href = 'admin.html';
+        }
+
+        // Verifica automaticamente all'avvio
+        document.addEventListener('DOMContentLoaded', function() {
+            checkFiles();
+        });
+    </script>
+</body>
+</html>

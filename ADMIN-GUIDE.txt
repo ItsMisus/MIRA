@@ -1,0 +1,108 @@
+🎮 PANNELLO ADMIN MISUSTECH - GUIDA RAPIDA
+================================================
+
+📌 ACCEDI SUBITO AL PANNELLO:
+http://localhost/misustech/admin.html
+
+🚀 PRIMO ACCESSO? SEGUI QUESTI STEP:
+
+1. Apri: http://localhost/misustech/setup-admin.html
+2. Clicca "Esegui Migrazione"
+3. Apri: http://localhost/misustech/migrate-browser.html
+4. Scarica il file products.json generato
+5. Sostituisci il file products.json nella cartella misustech
+6. Ricarica il pannello admin
+
+================================================
+
+✨ COSA PUOI FARE:
+
+✅ GESTIRE PC
+   - Aggiungi nuovi PC
+   - Modifica quelli esistenti
+   - Elimina PC non più disponibili
+   - Assegna MULTIPLE categorie ad ogni PC
+   - Gestisci sconti con prezzo barrato
+
+✅ CATEGORIE
+   - bestseller (migliori vendite)
+   - offerte (sconti settimanali)
+   - pronta-consegna (disponibilità immediata)
+   - console-killer (supera le console)
+   - + Crea categorie personalizzate
+
+✅ TAG VISIVI
+   - ⭐ Best Seller
+   - 🔥 Hot Deal / Offerta
+   - ✨ Nuovo arrivo
+   - 👍 Staff consigliato
+   - + Crea tag personalizzati
+
+✅ IMMAGINI
+   - Carica via URL da CDN
+   - Mostra subito in anteprima
+
+================================================
+
+🎯 FEATURES PRINCIPALI:
+
+📦 Gestione Completa Prodotti
+   - Nome, prezzo, sconto
+   - Descrizione dettagliata
+   - Componenti specifici
+   - Immagine
+
+🏷️  Categorie Multiple
+   - Un PC può avere più categorie
+   - Perfetto per filtri avanzati
+   - Gestione colorata e intuitiva
+
+🎨 Tag Visivi
+   - Evidenzia offerte speciali
+   - Personalizzabile con emoji
+   - Colori differenti per tipo
+
+💰 Sistema Sconti
+   - Inserisci prezzo scontato
+   - Prezzo originale barrato automaticamente
+   - Calcolo percentuale sconto
+
+📄 Paginazione
+   - Automaticamente 6 PC per pagina
+   - Navigazione facile tra pagine
+
+================================================
+
+📱 ACCESSO RAPIDO:
+
+Pannello Admin:     http://localhost/misustech/admin.html
+Setup/Guida:        http://localhost/misustech/setup-admin.html
+Migrazione Browser: http://localhost/misustech/migrate-browser.html
+Sito Principale:    http://localhost/misustech/index.html
+
+================================================
+
+💡 CONSIGLI:
+
+1. Sempre con almeno una categoria per PC
+2. Usa tag per evidenziare offerte importanti
+3. Aggiorna le immagini periodicamente
+4. Backup di products.json regolarmente
+5. Testa i filtri dopo aggiungere categorie
+
+================================================
+
+⚠️ IMPORTANTE:
+
+- Non c'è password al momento (aggiungila per produzione!)
+- Backup regolari di products.json
+- Controlla il format JSON se hai problemi
+- PHP deve avere permessi di scrittura
+
+================================================
+
+Contatti: misustech@gmail.com
+Versione: 1.0
+Data: Dicembre 2025
+
+🚀 BUONA AMMINISTRAZIONE!

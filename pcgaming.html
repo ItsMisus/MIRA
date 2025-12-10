@@ -6,6 +6,12 @@
     <title>PC Gaming - MISUSTECH</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    
+    <!-- New Optimization Systems -->
+    <script src="storage.js"></script>
+    <script src="file-upload.js"></script>
+    <script src="languages.js"></script>
+    <script src="utilities.js"></script>
 </head>
 <body>
 
@@ -13,34 +19,58 @@
     <main>
         <h1 class="page-title">PC Gaming</h1>
         
-        <!-- Filtri -->
-        <div class="filters">
-            <h2>Filtra per categoria</h2>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-category="all">Tutti i prodotti</button>
-                <button class="filter-btn" data-category="bestseller">Best Sellers</button>
-                <button class="filter-btn" data-category="pronta-consegna">Pronta Consegna</button>
-                <button class="filter-btn" data-category="rtx5000">Nvidia RTX 5000</button>
-                <button class="filter-btn" data-category="rx9000">Radeon RX 9000</button>
-                <button class="filter-btn" data-category="personalizzati">Personalizzati</button>
-                <button class="filter-btn" data-category="offerte">Offerte Settimanali ❤</button>
-                <button class="filter-btn" data-category="white">White Edition</button>
-                <button class="filter-btn" data-category="console-killer">Console Killer</button>
+        <div class="catalog-container">
+            <!-- Sidebar Filtri a Sinistra -->
+            <aside class="filters-sidebar">
+                <h2>Filtri</h2>
+                <div class="filter-list">
+                    <button class="filter-item active" data-category="all">Tutti i prodotti</button>
+                    <button class="filter-item" data-category="bestseller">Best Sellers</button>
+                    <button class="filter-item" data-category="pronta-consegna">Pronta Consegna</button>
+                    <button class="filter-item" data-category="rtx5000">Nvidia RTX 5000</button>
+                    <button class="filter-item" data-category="rx9000">Radeon RX 9000</button>
+                    <button class="filter-item" data-category="personalizzati">Personalizzati</button>
+                    <button class="filter-item" data-category="white">White Edition</button>
+                    <button class="filter-item" data-category="console-killer">Console Killer</button>
+                </div>
+            </aside>
+
+            <!-- Area Principale -->
+            <div class="catalog-main">
+                <!-- Header con Counter e Ordinamento -->
+                <div class="catalog-header">
+                    <div class="product-counter">
+                        <span id="productCount">0</span> prodotti
+                    </div>
+                    <div class="sort-section">
+                        <label for="sortSelect">Ordina per:</label>
+                        <select id="sortSelect">
+                            <option value="featured">In primo piano</option>
+                            <option value="best-seller">Best seller</option>
+                            <option value="alpha-asc">In ordine alfabetico, A-Z</option>
+                            <option value="alpha-desc">In ordine alfabetico, Z-A</option>
+                            <option value="price-asc">Prezzo crescente</option>
+                            <option value="price-desc">Prezzo decrescente</option>
+                            <option value="date-asc">Data, da meno a più recente</option>
+                            <option value="date-desc">Data, da più a meno recente</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Grid Prodotti -->
+                <div class="products-grid" id="productsContainer">
+                    <!-- Prodotti caricati dinamicamente -->
+                </div>
+
+                <!-- LA PAGINAZIONE VIENE CREATA DINAMICAMENTE DA JAVASCRIPT -->
             </div>
         </div>
-        
-        <div class="products" id="productsContainer">
-            <!-- Prodotti caricati dinamicamente -->
-        </div>
-        
-        <!-- Paginazione -->
-        <div class="pagination"></div>
         
         <!-- Bottone PC Custom -->
         <div class="custom-pc-container">
             <h2>Crea il tuo PC Gaming Personalizzato</h2>
             <p>Non trovi la configurazione che fa per te? Costruisci il tuo PC scegliendo ogni singolo componente!</p>
-            <a href="custom-pc.html" class="custom-pc-btn">Crea PC Personalizzato Adesso!</a>
+            <a href="custom-pc.html" class="custom-pc-btn">🎮 Crea PC Personalizzato Adesso!</a>
         </div>
     </main>
 
@@ -78,7 +108,9 @@
     </footer>
 
     <!-- Script -->
-<script src="script.js"></script>
-<script src="languages.js"></script>
-<script src="components.js"></script>
+    <script src="script.js"></script>
+    <script src="pcgaming.js"></script>
+    <script src="languages.js"></script>
+    <script src="components.js"></script>
+</body>
 </html>
