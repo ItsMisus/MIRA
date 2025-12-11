@@ -178,76 +178,46 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupPagination() {
         const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
         
-        // Cerca o crea il container della paginazione
-        let paginationContainer = document.querySelector('.pagination-container');
-        
-        // Se non esiste, crealo
-        if (!paginationContainer) {
-            paginationContainer = document.createElement('div');
-            paginationContainer.className = 'pagination-container';
-            
-            // Inseriscilo DOPO la griglia prodotti MA PRIMA del custom PC container
-            const mainElement = document.querySelector('main');
-            const customPcDiv = mainElement.querySelector('div[style*="text-align:center"]');
-            
-            if (customPcDiv) {
-                mainElement.insertBefore(paginationContainer, customPcDiv);
-            } else {
-                // Se non trova il custom PC container, inserisci dopo i prodotti
-                productsContainer.parentElement.insertBefore(paginationContainer, productsContainer.nextSibling);
-            }
+        let paginationDiv = document.querySelector('.pagination');
+        if (!paginationDiv) {
+            paginationDiv = document.createElement('div');
+            paginationDiv.className = 'pagination';
+            paginationDiv.style.cssText = 'display:flex; justify-content:center; align-items:center; gap:20px; margin:40px 0;';
+            productsContainer.parentElement.appendChild(paginationDiv);
         }
 
-        paginationContainer.innerHTML = '';
-        paginationContainer.className = 'pagination-container';
+        paginationDiv.innerHTML = '';
 
-        if (totalPages <= 1) {
-            paginationContainer.style.display = 'none';
-            return;
-        }
-        
-        paginationContainer.style.display = 'flex';
+        if (totalPages <= 1) return;
 
-        // Freccia sinistra
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'pagination-arrow';
-        prevBtn.innerHTML = '←';
-        prevBtn.disabled = currentPage === 1;
-        prevBtn.addEventListener('click', () => {
-            if (currentPage > 1) {
+        if (currentPage > 1) {
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'btn-primary';
+            prevBtn.innerHTML = '← Indietro';
+            prevBtn.addEventListener('click', () => {
                 displayPage(currentPage - 1);
-                setupPagination();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        });
-        paginationContainer.appendChild(prevBtn);
+            });
+            paginationDiv.appendChild(prevBtn);
+        }
 
-        // Info pagina
-        const pageInfo = document.createElement('div');
-        pageInfo.className = 'pagination-info';
-        pageInfo.innerHTML = `
-            Pagina 
-            <span class="pagination-current">${currentPage}</span>
-            di 
-            <span>${totalPages}</span>
-        `;
-        paginationContainer.appendChild(pageInfo);
+        const pageInfo = document.createElement('span');
+        pageInfo.style.cssText = 'color:#9b59b6; font-weight:700; font-size:1.1rem;';
+        pageInfo.textContent = `Pagina ${currentPage} di ${totalPages}`;
+        paginationDiv.appendChild(pageInfo);
 
-        // Freccia destra
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'pagination-arrow';
-        nextBtn.innerHTML = '→';
-        nextBtn.disabled = currentPage >= totalPages;
-        nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
+        if (currentPage < totalPages) {
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'btn-primary';
+            nextBtn.innerHTML = 'Avanti →';
+            nextBtn.addEventListener('click', () => {
                 displayPage(currentPage + 1);
-                setupPagination();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        });
-        paginationContainer.appendChild(nextBtn);
+            });
+            paginationDiv.appendChild(nextBtn);
+        }
     }
-    
+
     // Esponi funzioni globalmente per i filtri
     window.filterProducts = function(category) {
         if (category === 'all') {

@@ -31,7 +31,25 @@ const translations = {
         approveDiscounts: "Approfitta dei nostri sconti esclusivi sui migliori PC gaming!",
         notFound: "Il prodotto che stai cercando non è disponibile",
         createCustom: "Crea il tuo PC Gaming Personalizzato",
-        pageTitle: "Best Seller"
+        pageTitle: "Best Seller",
+        // Pagina Contattaci
+        contactPageTitle: "Contattaci",
+        contactName: "Nome:",
+        contactSurname: "Cognome:",
+        contactEmail: "Email:",
+        contactEmailPlaceholder: "Es. esempio@email.com",
+        contactMessage: "Corpo del Messaggio:",
+        contactSubmit: "Invia ora",
+        // Footer
+        whoWeAre: "Chi Siamo",
+        ourStory: "La nostra storia",
+        contactPageLink: "Contattaci",
+        discordCommunity: "Community Discord",
+        legalInfo: "Informazioni Legali",
+        support: "Supporto",
+        createPC: "Crea PC Custom",
+        completeCatalog: "Catalogo Completo",
+        allRightsReserved: "© 2025 MIRA | Tutti i diritti riservati"
     },
     en: {
         searchPlaceholder: "Search a PC",
@@ -63,19 +81,74 @@ const translations = {
         approveDiscounts: "Take advantage of our exclusive discounts on the best gaming PCs!",
         notFound: "The product you are looking for is not available",
         createCustom: "Create Your Custom Gaming PC",
-        pageTitle: "Best Seller"
+        pageTitle: "Best Seller",
+        // Contact Page
+        contactPageTitle: "Contact Us",
+        contactName: "Name:",
+        contactSurname: "Surname:",
+        contactEmail: "Email:",
+        contactEmailPlaceholder: "E.g. example@email.com",
+        contactMessage: "Message Body:",
+        contactSubmit: "Send Now",
+        // Footer
+        whoWeAre: "About Us",
+        ourStory: "Our Story",
+        contactPageLink: "Contact Us",
+        discordCommunity: "Discord Community",
+        legalInfo: "Legal Information",
+        support: "Support",
+        createPC: "Create Custom PC",
+        completeCatalog: "Complete Catalog",
+        allRightsReserved: "© 2025 MIRA | All rights reserved"
     }
 };
 
-// Lingua attuale
+// Lingua attuale - carica dal localStorage
 let currentLanguage = localStorage.getItem('siteLanguage') || 'it';
 
-// Inizializza il sistema di lingue
+/**
+ * Traduce tutti gli elementi con data-i18n nel DOM
+ */
+function applyLanguage(lang) {
+    console.log('Applicando lingua:', lang); // Debug
+    
+    const translation = translations[lang] || translations['it'];
+    
+    // Traduce elementi con data-i18n (testo)
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if(translation[key]) {
+            element.textContent = translation[key];
+        }
+    });
+    
+    // Traduce placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        if(translation[key]) {
+            element.setAttribute('placeholder', translation[key]);
+        }
+    });
+    
+    // Traduce title
+    document.querySelectorAll('[data-i18n-title]').forEach(element => {
+        const key = element.getAttribute('data-i18n-title');
+        if(translation[key]) {
+            element.setAttribute('title', translation[key]);
+        }
+    });
+}
+
+/**
+ * Inizializza il sistema di traduzione
+ */
 function initLanguageSystem() {
+    console.log('Inizializzando sistema linguistico'); // Debug
+    
     const languageDropdown = document.getElementById('languageDropdown');
     
     if(languageDropdown) {
-        // Imposta la lingua salvata
+        // Imposta il valore attuale nel dropdown
         languageDropdown.value = currentLanguage;
         
         // Ascolta i cambiamenti
@@ -88,69 +161,20 @@ function initLanguageSystem() {
     applyLanguage(currentLanguage);
 }
 
-// Cambia la lingua
+/**
+ * Cambia la lingua (senza ricaricare la pagina)
+ */
 function changeLanguage(lang) {
+    console.log('Cambiando lingua a:', lang); // Debug
+    
     currentLanguage = lang;
     localStorage.setItem('siteLanguage', lang);
     applyLanguage(lang);
-    location.reload(); // Ricarica la pagina per applicare i cambiamenti
 }
 
-// Applica la lingua a tutta la pagina
-function applyLanguage(lang) {
-    const translation = translations[lang] || translations['it'];
-    
-    // Aggiorna placeholder della ricerca
-    const searchInput = document.querySelector('.search-language-cart input');
-    if(searchInput) {
-        searchInput.placeholder = translation.searchPlaceholder;
-    }
-    
-    // Aggiorna titoli dei bottoni
-    const accountBtn = document.getElementById('accountBtn');
-    if(accountBtn) {
-        accountBtn.title = translation.account;
-    }
-    
-    const cartBtn = document.getElementById('cartBtn');
-    if(cartBtn) {
-        cartBtn.title = translation.cart;
-    }
-    
-    // Aggiorna i titoli delle pagine
-    const pageTitle = document.querySelector('.page-title');
-    if(pageTitle && pageTitle.textContent.includes('Best Seller')) {
-        pageTitle.textContent = translation.bestSeller;
-    }
-    
-    // Aggiorna bottone contatti
-    const contactLink = document.querySelector('.contact-us-link');
-    if(contactLink) {
-        contactLink.textContent = translation.contactUs;
-    }
-    
-    // Aggiorna categorie di navigazione
-    const navLinks = document.querySelectorAll('.categories a');
-    const navMapping = {
-        0: 'gaming',
-        1: 'offers',
-        2: 'about',
-        3: 'discord'
-    };
-    navLinks.forEach((link, index) => {
-        const key = navMapping[index];
-        if(key && translation[key]) {
-            link.textContent = translation[key];
-        }
-    });
-}
-
-// Inizializza al caricamento della pagina
-document.addEventListener('DOMContentLoaded', () => {
-    initLanguageSystem();
-});
-
-// Funzione per ottenere una traduzione
+/**
+ * Funzione helper per ottenere una traduzione
+ */
 function t(key) {
     const translation = translations[currentLanguage] || translations['it'];
     return translation[key] || key;
