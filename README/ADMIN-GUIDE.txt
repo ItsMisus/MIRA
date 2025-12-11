@@ -1,16 +1,16 @@
-🎮 PANNELLO ADMIN MISUSTECH - GUIDA RAPIDA
+🎮 PANNELLO ADMIN MINUTECH - GUIDA RAPIDA
 ================================================
 
 📌 ACCEDI SUBITO AL PANNELLO:
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 
 🚀 PRIMO ACCESSO? SEGUI QUESTI STEP:
 
-1. Apri: http://localhost/misustech/setup-admin.html
+1. Apri: http://localhost/minutech/setup-admin.html
 2. Clicca "Esegui Migrazione"
-3. Apri: http://localhost/misustech/migrate-browser.html
+3. Apri: http://localhost/minutech/migrate-browser.html
 4. Scarica il file products.json generato
-5. Sostituisci il file products.json nella cartella misustech
+5. Sostituisci il file products.json nella cartella minutech
 6. Ricarica il pannello admin
 
 ================================================
@@ -75,10 +75,10 @@ http://localhost/misustech/admin.html
 
 📱 ACCESSO RAPIDO:
 
-Pannello Admin:     http://localhost/misustech/admin.html
-Setup/Guida:        http://localhost/misustech/setup-admin.html
-Migrazione Browser: http://localhost/misustech/migrate-browser.html
-Sito Principale:    http://localhost/misustech/index.html
+Pannello Admin:     http://localhost/minutech/admin.html
+Setup/Guida:        http://localhost/minutech/setup-admin.html
+Migrazione Browser: http://localhost/minutech/migrate-browser.html
+Sito Principale:    http://localhost/minutech/index.html
 
 ================================================
 
@@ -101,7 +101,7 @@ Sito Principale:    http://localhost/misustech/index.html
 
 ================================================
 
-Contatti: misustech@gmail.com
+Contatti: minutech@gmail.com
 Versione: 1.0
 Data: Dicembre 2025
 

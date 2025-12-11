@@ -1,4 +1,4 @@
-# 🎮 Pannello Admin MISUSTECH - Documentazione Completa
+# 🎮 Pannello Admin MINUTECH - Documentazione Completa
 
 ## 📋 Cosa è stato creato
 
@@ -35,7 +35,7 @@ php migrate.php
 
 Apri nel browser:
 ```
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 ```
 
 ---

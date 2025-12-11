@@ -1,13 +1,13 @@
-🎮 PANNELLO ADMIN MISUSTECH - PRIMO ACCESSO
+🎮 PANNELLO ADMIN MINUTECH - PRIMO ACCESSO
 ═══════════════════════════════════════════════════════════════════════════════
 
 APRI QUESTO FILE NEL BROWSER PER SEGUIRE VISUALMENTE TUTTI I STEP!
 
 URL:
-http://localhost/misustech/QUICKSTART.html
+http://localhost/minutech/QUICKSTART.html
 
 Oppure accedi direttamente:
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -15,7 +15,7 @@ http://localhost/misustech/admin.html
 
 STEP 1: Vai a setup (apri nel browser)
 ────────────────────────────────────────────────────────────────────────────────
-http://localhost/misustech/QUICKSTART.html
+http://localhost/minutech/QUICKSTART.html
 
 Vedrai una pagina con 6 card e uno stra-grande bottone "APRI PANNELLO ADMIN"
 
@@ -35,7 +35,7 @@ Vedrai dei step:
 STEP 4: Migrazione nel browser
 ────────────────────────────────────────────────────────────────────────────────
 Ti aparirà una pagina di migrazione:
-http://localhost/misustech/migrate-browser.html
+http://localhost/minutech/migrate-browser.html
 
 Vedrai:
 - Una log box con messaggi
@@ -45,7 +45,7 @@ Clicca SCARICA!
 
 STEP 5: Sostituisci il file
 ────────────────────────────────────────────────────────────────────────────────
-Vai nella cartella: C:\Users\gigio\Desktop\MisusTech
+Vai nella cartella: C:\Users\gigio\Desktop\MinuTech
 
 Troverai un file: products.json
 
@@ -55,7 +55,7 @@ Sostituiscilo con il file scaricato dal browser
 STEP 6: Accedi al pannello
 ────────────────────────────────────────────────────────────────────────────────
 Ora apri nel browser:
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 
 FATTO! ✅ Sei dentro il pannello admin!
 
@@ -179,22 +179,22 @@ Se tutto funziona: ✅ PRONTO A PARTIRE!
 🎮 SCORCIATOIE RAPIDE
 
 Apri admin.html direttamente:
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 
 Vedi una guida visuale:
-http://localhost/misustech/QUICKSTART.html
+http://localhost/minutech/QUICKSTART.html
 
 Leggi documentazione:
 README-ADMIN.md (nel file manager)
 
 Vedi esempio di integrazione:
-http://localhost/misustech/example-products-display.html
+http://localhost/minutech/example-products-display.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 
 ❓ HAI DOMANDE?
 
-Email: misustech@gmail.com
+Email: minutech@gmail.com
 
 Oppure leggi i file di documentazione:
 - README-ADMIN.md (completa)
@@ -205,11 +205,11 @@ Oppure leggi i file di documentazione:
 
 🎉 PRONTO? INIZIA ADESSO!
 
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 
 O per la guida visuale:
 
-http://localhost/misustech/QUICKSTART.html
+http://localhost/minutech/QUICKSTART.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 Buona amministrazione! 🚀

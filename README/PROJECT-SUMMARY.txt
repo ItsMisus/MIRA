@@ -2,7 +2,7 @@
 ║                                                                                  ║
 ║                         ✨ PROGETTO COMPLETATO ✨                              ║
 ║                                                                                  ║
-║                    PANNELLO ADMIN MISUSTECH v1.0                                ║
+║                    PANNELLO ADMIN MINUTECH v1.0                                ║
 ║                                                                                  ║
 ║                          🎮 Sistema di Gestione Catalogo 🎮                     ║
 ║                                                                                  ║
@@ -393,9 +393,9 @@ LONG TERM (3+ mesi):
 📞 SUPPORTO E CONTATTI
 ═══════════════════════════════════════════════════════════════════════════════
 
-Email: misustech@gmail.com
+Email: minutech@gmail.com
 Discord: Community server (quando online)
-Sito: https://misustech.it
+Sito: https://minutech.it
 
 Per bug report:
 → Controlla console (F12 → Console)
@@ -442,12 +442,12 @@ QUALITÀ:         Enterprise Grade
 SUPPORTO:        Community & Email
 ═══════════════════════════════════════════════════════════════════════════════
 
-Sviluppato con ❤️  per MISUSTECH PC Gaming
+Sviluppato con ❤️  per MINUTECH PC Gaming
 
 ╔════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                  ║
 ║                        🚀 BUONA AMMINISTRAZIONE! 🚀                             ║
 ║                                                                                  ║
-║                   Apri: http://localhost/misustech/admin.html                  ║
+║                   Apri: http://localhost/minutech/admin.html                  ║
 ║                                                                                  ║
 ╚════════════════════════════════════════════════════════════════════════════════╝

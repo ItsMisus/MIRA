@@ -1,5 +1,5 @@
 ================================================================================
-MISUSTECH - OPTIMIZATION & CLEANUP - FINAL SUMMARY
+MINUTECH - OPTIMIZATION & CLEANUP - FINAL SUMMARY
 ================================================================================
 
 ✅ COMPLETATO: Gennaio 2025
@@ -114,7 +114,7 @@ Tempo totale: ~30 minuti per integrazione completa
 STRUTTURA FINALE PROGETTO
 ================================================================================
 
-c:\Users\gigio\Desktop\MisusTech\
+c:\Users\gigio\Desktop\MinuTech\
 │
 ├─ 🎨 Frontend (html + css + js)
 ├─ 🛠️ Admin System (panel utenti)

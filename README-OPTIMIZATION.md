@@ -1,4 +1,4 @@
-# 🎮 MISUSTECH - SISTEMA DI OTTIMIZZAZIONE COMPLETATO
+# 🎮 MINUTECH - SISTEMA DI OTTIMIZZAZIONE COMPLETATO
 
 ## 📋 Sommario Esecuzione
 
@@ -142,7 +142,7 @@ window.showNotification(message, duration)
 ## 🗂️ Struttura Progetto Finale
 
 ```
-c:\Users\gigio\Desktop\MisusTech\
+c:\Users\gigio\Desktop\MinuTech\
 │
 ├─ 🎨 FRONTEND CORE
 │  ├── index.html (homepage)

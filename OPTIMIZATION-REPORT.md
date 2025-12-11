@@ -1,4 +1,4 @@
-# OPTIMIZATION REPORT - MISUSTECH
+# OPTIMIZATION REPORT - MINUTECH
 
 ## Esecuzione Data
 **Data**: Gennaio 2025
@@ -184,7 +184,7 @@ window.displayProducts(products, 'productsContainer');
 ## 7. STRUTTURA FILE FINALE
 
 ```
-c:\Users\gigio\Desktop\MisusTech\
+c:\Users\gigio\Desktop\MinuTech\
 ├── Frontend Core
 │   ├── index.html
 │   ├── script.js (ridotto, usa utilities.js)

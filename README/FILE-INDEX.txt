@@ -1,6 +1,6 @@
 ╔════════════════════════════════════════════════════════════════════════════════╗
 ║                                                                                  ║
-║                  🎮 PANNELLO ADMIN MISUSTECH - INDICE FILE                       ║
+║                  🎮 PANNELLO ADMIN MINUTECH - INDICE FILE                       ║
 ║                                                                                  ║
 ╚════════════════════════════════════════════════════════════════════════════════╝
 
@@ -102,22 +102,22 @@
 ═══════════════════════════════════════════════════════════════════════════════
 
 🔐 Setup Iniziale:
-   http://localhost/misustech/setup-admin.html
+   http://localhost/minutech/setup-admin.html
    ↓
    Clicca "Esegui Migrazione"
    ↓
-   http://localhost/misustech/migrate-browser.html
+   http://localhost/minutech/migrate-browser.html
    ↓
    Scarica products.json e sostituisci il file
 
 🎮 Pannello Admin:
-   http://localhost/misustech/admin.html
+   http://localhost/minutech/admin.html
 
 📚 Documentazione:
    Leggi: README-ADMIN.md o IMPLEMENTAZIONE-ADMIN.md
 
 💡 Esempio Integrazione:
-   http://localhost/misustech/example-products-display.html
+   http://localhost/minutech/example-products-display.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -273,15 +273,15 @@ STEP 4: Verifica
 📞 CONTATTI
 ═══════════════════════════════════════════════════════════════════════════════
 
-Email:    misustech@gmail.com
+Email:    minutech@gmail.com
 Discord:  Community server
-Sito:     https://misustech.it (quando online)
+Sito:     https://minutech.it (quando online)
 
 ═══════════════════════════════════════════════════════════════════════════════
 
 ✅ READY TO USE!
 
-Inizia adesso: http://localhost/misustech/setup-admin.html
+Inizia adesso: http://localhost/minutech/setup-admin.html
 
 Buona amministrazione! 🎮🚀
 

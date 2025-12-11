@@ -6,7 +6,7 @@ function createHeader() {
     header.className = 'header-container';
     header.innerHTML = `
         <div class="header-top">
-            <div class="logo" onclick="window.location.href='index.html'">MISUSTECH</div>
+            <div class="logo" onclick="window.location.href='index.html'">MINUTECH</div>
             
             <form class="header-search" id="searchForm">
                 <input type="text" placeholder="Cerca un PC" name="search">
@@ -70,10 +70,10 @@ function createFooter() {
 
             <div class="footer-section">
                 <h3>Informazioni Legali</h3>
-                <p><strong>MISUSTECH s.r.l.</strong></p>
+                <p><strong>MINUTECH s.r.l.</strong></p>
                 <p>Partita IVA: <strong>IT01234567890</strong></p>
                 <p>Via Roma 123, 76121<br>Barletta (BA) - Italia</p>
-                <p><strong>Telefono:</strong> 377 590 0298<br><strong>Email:</strong> misustech@gmail.com</p>
+                <p><strong>Telefono:</strong> 377 590 0298<br><strong>Email:</strong> minutech@gmail.com</p>
             </div>
 
             <div class="footer-section">
@@ -87,7 +87,7 @@ function createFooter() {
         </div>
 
         <p style="text-align:center; color:#888; padding-top:20px; border-top:1px solid rgba(155,89,182,0.2);">
-            © 2025 MISUSTECH | Tutti i diritti riservati
+            © 2025 MINUTECH | Tutti i diritti riservati
         </p>
     `;
     

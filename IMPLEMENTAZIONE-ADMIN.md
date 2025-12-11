@@ -1,8 +1,8 @@
-# 🎮 PANNELLO ADMIN MISUSTECH - RESOCONTO COMPLETO
+# 🎮 PANNELLO ADMIN MINUTECH - RESOCONTO COMPLETO
 
 ## 📦 Cosa è stato creato
 
-Un sistema completo di amministrazione per gestire il catalogo PC Gaming del sito MISUSTECH con:
+Un sistema completo di amministrazione per gestire il catalogo PC Gaming del sito MINUTECH con:
 
 ### ✨ Funzionalità Principali
 
@@ -89,12 +89,12 @@ ADMIN-GUIDE.txt          (3 KB) - Guida rapida
 2. Clicca "Esegui Migrazione"
 3. Apri: migrate-browser.html
 4. Scarica products.json generato
-5. Sostituisci il file nella cartella misustech
+5. Sostituisci il file nella cartella minutech
 ```
 
 ### Step 2: Accedi al Pannello
 ```
-http://localhost/misustech/admin.html
+http://localhost/minutech/admin.html
 ```
 
 ### Step 3: Usa le Funzionalità
@@ -326,10 +326,10 @@ php migrate.php
 # Verifica permessi (Linux/Mac)
 ls -la products.json
 chmod 644 products.json
-chmod 755 /path/to/misustech
+chmod 755 /path/to/minutech
 
 # Test API
-curl http://localhost/misustech/admin-api.php?action=getAll
+curl http://localhost/minutech/admin-api.php?action=getAll
 ```
 
 ### File di Log
@@ -341,7 +341,7 @@ curl http://localhost/misustech/admin-api.php?action=getAll
 
 ## 🎉 Conclusione
 
-Il pannello admin MISUSTECH è pronto per:
+Il pannello admin MINUTECH è pronto per:
 - ✅ Gestire catalogo PC Gaming
 - ✅ Creare offerte speciali
 - ✅ Organizzare prodotti con categorie

@@ -1,15 +1,15 @@
 ═══════════════════════════════════════════════════════════════════════════════
-                    ✨ PANNELLO ADMIN MISUSTECH ✨
+                    ✨ PANNELLO ADMIN MINUTECH ✨
                          COMPLETAMENTE IMPLEMENTATO
 ═══════════════════════════════════════════════════════════════════════════════
 
 🎯 ACCESSO ISTANTANEO
 ───────────────────────────────────────────────────────────────────────────────
 
-    OPEN NOW: http://localhost/misustech/admin.html
+    OPEN NOW: http://localhost/minutech/admin.html
 
     Oppure se è la PRIMA VOLTA:
-    SETUP: http://localhost/misustech/QUICKSTART.html
+    SETUP: http://localhost/minutech/QUICKSTART.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -183,7 +183,7 @@ Prodotti non caricano?
 
 📞 SUPPORTO RAPIDO
 
-Email: misustech@gmail.com
+Email: minutech@gmail.com
 Discord: Community server
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -191,10 +191,10 @@ Discord: Community server
 🎉 PRONTO PER PARTIRE!
 
 Clicca adesso:
-→ http://localhost/misustech/admin.html
+→ http://localhost/minutech/admin.html
 
 O se è la prima volta:
-→ http://localhost/misustech/QUICKSTART.html
+→ http://localhost/minutech/QUICKSTART.html
 
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -202,6 +202,6 @@ Versione: 1.0
 Data: Dicembre 2025
 Status: ✅ FULLY IMPLEMENTED & TESTED
 
-Sviluppato con ❤️ per MISUSTECH
+Sviluppato con ❤️ per MINUTECH
 
 ═══════════════════════════════════════════════════════════════════════════════

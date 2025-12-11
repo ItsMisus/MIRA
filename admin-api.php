@@ -1,6 +1,6 @@
 <?php
 /**
- * ADMIN API - MISUSTECH
+ * ADMIN API - MINUTECH
  * Gestisce le operazioni CRUD per prodotti, categorie e tag
  */
 

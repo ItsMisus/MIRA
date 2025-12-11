@@ -8,7 +8,7 @@
 window.storage = {
     // Config
     config: {
-        dbName: 'misustech-db',
+        dbName: 'minutech-db',
         version: 1,
         storeName: 'data',
         useMemoryCache: true
