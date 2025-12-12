@@ -121,3 +121,4 @@ function initHeaderEvents() {
         });
     }
 }
+//components.js

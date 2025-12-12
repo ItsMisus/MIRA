@@ -499,4 +499,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     console.log('MIRA: All systems initialized');
+    //script.js
 });

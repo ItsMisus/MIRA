@@ -652,4 +652,5 @@ Desktop: > 1024px
 
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
+    /*responsive.css*/
 }

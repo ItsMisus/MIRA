@@ -228,4 +228,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Errore:', error);
         window.location.href = 'notfound.html';
     }
+    //reviews.js
 });

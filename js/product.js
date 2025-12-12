@@ -441,4 +441,5 @@ if (document.getElementById('productsContainer') && window.location.pathname.inc
     } else {
         displayProducts(offerProducts, 'productsContainer');
     }
+    //product.js
 }

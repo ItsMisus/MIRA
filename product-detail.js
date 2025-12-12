@@ -274,4 +274,5 @@ function initTabs() {
             document.getElementById(targetTab).classList.add('active');
         });
     });
+    //product-detail.js
 }

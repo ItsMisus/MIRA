@@ -178,4 +178,5 @@ function changeLanguage(lang) {
 function t(key) {
     const translation = translations[currentLanguage] || translations['it'];
     return translation[key] || key;
+    //language.js
 }
