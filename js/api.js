@@ -12,9 +12,6 @@ class MiraAPI {
         this.token = localStorage.getItem('miraToken');
     }
 
-    /**
-     * Generic request handler
-     */
     async request(endpoint, options = {}) {
         const url = `${this.baseURL}/${endpoint}`;
         const headers = {
@@ -47,47 +44,29 @@ class MiraAPI {
 
     // ==================== PRODUCTS ====================
     
-    /**
-     * Get all products with filters
-     */
     async getProducts(filters = {}) {
         const params = new URLSearchParams(filters);
         return this.request(`products.php?${params}`);
     }
 
-    /**
-     * Get single product by ID
-     */
     async getProduct(id) {
         return this.request(`products.php?id=${id}`);
     }
 
-    /**
-     * Get product by slug
-     */
     async getProductBySlug(slug) {
         return this.request(`products.php?slug=${slug}`);
     }
 
-    /**
-     * Search products
-     */
     async searchProducts(query, filters = {}) {
         return this.getProducts({ ...filters, search: query });
     }
 
     // ==================== REVIEWS ====================
     
-    /**
-     * Get reviews for product
-     */
     async getReviews(productId) {
         return this.request(`reviews.php?product_id=${productId}`);
     }
 
-    /**
-     * Submit review
-     */
     async submitReview(productId, data) {
         return this.request('reviews.php', {
             method: 'POST',
@@ -100,16 +79,10 @@ class MiraAPI {
 
     // ==================== CART ====================
     
-    /**
-     * Get cart
-     */
     async getCart() {
         return this.request('cart.php');
     }
 
-    /**
-     * Add to cart
-     */
     async addToCart(productId, quantity = 1) {
         return this.request('cart.php', {
             method: 'POST',
@@ -117,9 +90,6 @@ class MiraAPI {
         });
     }
 
-    /**
-     * Update cart item
-     */
     async updateCartItem(itemId, quantity) {
         return this.request(`cart.php?id=${itemId}`, {
             method: 'PUT',
@@ -127,18 +97,12 @@ class MiraAPI {
         });
     }
 
-    /**
-     * Remove from cart
-     */
     async removeFromCart(itemId) {
         return this.request(`cart.php?id=${itemId}`, {
             method: 'DELETE'
         });
     }
 
-    /**
-     * Clear cart
-     */
     async clearCart() {
         return this.request('cart.php?clear=1', {
             method: 'DELETE'
@@ -147,9 +111,6 @@ class MiraAPI {
 
     // ==================== ORDERS ====================
     
-    /**
-     * Create order
-     */
     async createOrder(orderData) {
         return this.request('orders.php', {
             method: 'POST',
@@ -157,25 +118,16 @@ class MiraAPI {
         });
     }
 
-    /**
-     * Get user orders
-     */
     async getOrders() {
         return this.request('orders.php');
     }
 
-    /**
-     * Get single order
-     */
     async getOrder(orderId) {
         return this.request(`orders.php?id=${orderId}`);
     }
 
     // ==================== AUTH ====================
     
-    /**
-     * Login
-     */
     async login(email, password) {
         const response = await this.request('auth.php', {
             method: 'POST',
@@ -191,9 +143,6 @@ class MiraAPI {
         return response;
     }
 
-    /**
-     * Register
-     */
     async register(userData) {
         return this.request('auth.php', {
             method: 'POST',
@@ -201,25 +150,16 @@ class MiraAPI {
         });
     }
 
-    /**
-     * Logout
-     */
     logout() {
         this.token = null;
         localStorage.removeItem('miraToken');
         localStorage.removeItem('miraUser');
     }
 
-    /**
-     * Check if logged in
-     */
     isAuthenticated() {
         return !!this.token;
     }
 
-    /**
-     * Get current user
-     */
     getCurrentUser() {
         const user = localStorage.getItem('miraUser');
         return user ? JSON.parse(user) : null;
@@ -227,9 +167,6 @@ class MiraAPI {
 
     // ==================== CONTACT ====================
     
-    /**
-     * Send contact message
-     */
     async sendContactMessage(data) {
         return this.request('contact.php', {
             method: 'POST',
@@ -241,22 +178,17 @@ class MiraAPI {
 // ==================== EXPORT ====================
 const api = new MiraAPI();
 
-// Make globally available
 if (typeof window !== 'undefined') {
     window.MiraAPI = api;
 }
 
 // ==================== HELPER FUNCTIONS ====================
 
-/**
- * Display products in grid
- */
 async function displayProductsFromAPI(containerId, filters = {}) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
     try {
-        // Show loading
         container.innerHTML = '<div style="text-align:center; padding:40px;">Caricamento...</div>';
 
         const response = await api.getProducts(filters);
@@ -274,7 +206,6 @@ async function displayProductsFromAPI(containerId, filters = {}) {
             container.appendChild(card);
         });
 
-        // Update count if exists
         const countEl = document.getElementById('productsCount');
         if (countEl && response.data.pagination) {
             countEl.textContent = `${response.data.pagination.total} prodotti`;
@@ -282,13 +213,10 @@ async function displayProductsFromAPI(containerId, filters = {}) {
 
     } catch (error) {
         console.error('Error loading products:', error);
-        container.innerHTML = '<p style="text-align:center; color:#e74c3c; padding:40px;"></p>';
+        container.innerHTML = '<p style="text-align:center; color:#e74c3c; padding:40px;">Errore caricamento prodotti</p>';
     }
 }
 
-/**
- * Create product card element
- */
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -323,43 +251,42 @@ function createProductCard(product) {
         </div>
     `;
 
+    const productIdToUse = product.id;
+    
     card.addEventListener('click', () => {
-        window.location.href = `product.html?id=${product.id}`;
+        console.log('Navigating to product:', productIdToUse);
+         window.location.href = `product.html?id=${product.id}`;
     });
 
     return card;
 }
 
-/**
- * Load single product
- */
 async function loadProductFromAPI(productId) {
+    console.log('Loading product with ID:', productId);
+    
     try {
         const response = await api.getProduct(productId);
+        console.log('Product loaded:', response.data);
+        
         const product = response.data;
 
-        // Update page title
         document.title = `${product.name} - MIRA`;
 
-        // Update breadcrumb
         const breadcrumb = document.getElementById('productBreadcrumb');
         if (breadcrumb) breadcrumb.textContent = product.name;
 
-        // Update main image
         const mainImage = document.getElementById('mainProductImage');
         if (mainImage) {
             mainImage.src = product.image_url;
             mainImage.alt = product.name;
         }
 
-        // Update product info
         const title = document.getElementById('productTitle');
         if (title) title.textContent = product.name;
 
         const desc = document.getElementById('productDescription');
         if (desc) desc.textContent = product.description;
 
-        // Update rating
         const starsContainer = document.getElementById('productStars');
         if (starsContainer) {
             starsContainer.innerHTML = [1, 2, 3, 4, 5].map(star => 
@@ -370,7 +297,6 @@ async function loadProductFromAPI(productId) {
         const reviewCount = document.getElementById('reviewCount');
         if (reviewCount) reviewCount.textContent = `(${product.review_count} recensioni)`;
 
-        // Update price
         const priceEl = document.getElementById('productPrice');
         const priceOriginalEl = document.getElementById('productPriceOriginal');
         
@@ -388,7 +314,6 @@ async function loadProductFromAPI(productId) {
             }
         }
 
-        // Update specs
         const specsQuick = document.getElementById('specsQuick');
         const specsTable = document.getElementById('specsTable');
         
@@ -404,20 +329,27 @@ async function loadProductFromAPI(productId) {
             if (specsTable) specsTable.innerHTML = specsHTML;
         }
 
-        // Load reviews
         loadReviewsFromAPI(productId);
 
         return product;
 
     } catch (error) {
-        console.error('Error loading product:', error);
+        console.error('Error loading product from API:', error);
+        
+        console.log('Trying localStorage fallback...');
+        const localProducts = JSON.parse(localStorage.getItem('miraProducts') || '[]');
+        const localProduct = localProducts.find(p => p.id === productId);
+        
+        if (localProduct) {
+            console.log('Found product in localStorage:', localProduct);
+            return localProduct;
+        }
+        
+        console.error('Product not found anywhere');
         window.location.href = 'notfound.html';
     }
 }
 
-/**
- * Load reviews from API
- */
 async function loadReviewsFromAPI(productId) {
     const container = document.getElementById('reviewsContainer');
     if (!container) return;
@@ -449,45 +381,29 @@ async function loadReviewsFromAPI(productId) {
     }
 }
 
-/**
- * Initialize API-based cart
- */
 async function initAPICart() {
-    // This will replace the localStorage cart
-    // Implementation will sync with backend when user logs in
     console.log('API Cart initialized');
 }
 
+
 // ==================== AUTO-INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize header functionality on all pages
     initializeHeader();
     
-    // Auto-load products if on catalog pages
-    const productsGrid = document.getElementById('productsGrid');
-    if (productsGrid && window.location.pathname.includes('pcgaming')) {
-        displayProductsFromAPI('productsGrid');
-    }
-    
-    // Auto-load home products
+  // TEMPORANEAMENTE DISABILITATO - USA product.js
+    /*
     const homeGrid = document.getElementById('homeProductsGrid');
     if (homeGrid) {
         displayProductsFromAPI('homeProductsGrid', { featured: 'true', limit: 4 });
     }
-    
-    // Auto-load product detail
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-    if (productId && window.location.pathname.includes('product.html')) {
-        loadProductFromAPI(productId);
+    */
     }
-});
+    
 
-/**
- * Initialize header functionality
- */
+    
+);
+
 function initializeHeader() {
-    // Search functionality
     const searchBtn = document.getElementById('searchBtn');
     const searchOverlay = document.getElementById('searchOverlay');
     const searchClose = document.getElementById('searchClose');
@@ -511,7 +427,6 @@ function initializeHeader() {
             if (e.key === 'Enter') {
                 const query = mainSearchInput.value.trim();
                 if (query) {
-                    // Save search and redirect
                     sessionStorage.setItem('searchQuery', query);
                     window.location.href = `risultati.html?q=${encodeURIComponent(query)}`;
                 }
@@ -519,7 +434,6 @@ function initializeHeader() {
         });
     }
 
-    // Cart functionality
     const cartBtn = document.getElementById('cartBtn');
     const cartSidebar = document.getElementById('cartSidebar');
     const cartClose = document.getElementById('cartClose');
@@ -536,20 +450,15 @@ function initializeHeader() {
         });
     }
 
-    // Load cart items
     loadCartItems();
 }
 
-/**
- * Load cart items
- */
 async function loadCartItems() {
     const cartContent = document.getElementById('cartContent');
     if (!cartContent) return;
 
     try {
         if (api.isAuthenticated()) {
-            // Load from API
             const response = await api.getCart();
             const items = response.data.items || [];
             
@@ -558,7 +467,6 @@ async function loadCartItems() {
                 return;
             }
 
-            // Render items
             cartContent.innerHTML = items.map(item => `
                 <div class="cart-item">
                     <img src="${item.product.image_url}" alt="${item.product.name}">
@@ -576,7 +484,6 @@ async function loadCartItems() {
             `).join('');
 
         } else {
-            // Fallback to localStorage
             const localCart = JSON.parse(localStorage.getItem('miraCart') || '[]');
             if (localCart.length === 0) {
                 cartContent.innerHTML = '<p class="cart-empty">Il tuo carrello è vuoto</p>';
@@ -587,7 +494,6 @@ async function loadCartItems() {
     }
 }
 
-// ==================== GLOBAL FUNCTIONS ====================
 window.updateCartQuantity = async (itemId, quantity) => {
     try {
         await api.updateCartItem(itemId, quantity);
@@ -606,7 +512,6 @@ window.removeFromCart = async (itemId) => {
     }
 };
 
-// ==================== EXPORT FOR USE ====================
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { MiraAPI, api, displayProductsFromAPI, loadProductFromAPI };
 }

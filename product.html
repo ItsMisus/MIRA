@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prodotto - MIRA</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="product-page.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/product-page.css">
 </head>
 <body>
     <header class="header">
@@ -49,7 +49,7 @@
     <div class="search-overlay" id="searchOverlay">
         <div class="search-container">
             <input type="text" placeholder="Cerca..." class="search-input" id="mainSearchInput">
-            <button class="search-close" id="searchClose"></button>
+            <button class="search-close" id="searchClose">✕</button>
         </div>
     </div>
 
@@ -66,98 +66,10 @@
             </div>
         </div>
 
-        <!-- Product Hero Section -->
+        <!-- Product Content - Caricato dinamicamente -->
         <section class="product-hero">
-            <div class="product-hero-container">
-                <!-- Image Gallery -->
-                <div class="product-gallery">
-                    <div class="product-main-image">
-                        <img id="mainProductImage" src="" alt="">
-                    </div>
-                    <div class="product-thumbnails" id="thumbnailsContainer">
-                        <!-- Thumbnails generated dynamically -->
-                    </div>
-                </div>
-
-                <!-- Product Info -->
-                <div class="product-info-sticky">
-                    <h1 class="product-title" id="productTitle">Nome Prodotto</h1>
-                    
-                    <div class="product-rating-section">
-                        <div class="stars" id="productStars"></div>
-                        <span class="review-count" id="reviewCount">(0 recensioni)</span>
-                    </div>
-
-                    <div class="product-price-section">
-                        <span class="product-price" id="productPrice">€0.00</span>
-                        <span class="product-price-original" id="productPriceOriginal" style="display:none;">€0.00</span>
-                    </div>
-
-                    <div class="product-description" id="productDescription">
-                        Descrizione del prodotto
-                    </div>
-
-                    <!-- Add to Cart -->
-                    <button class="btn-add-cart-large" id="addToCartBtn">
-                        Aggiungi al carrello
-                    </button>
-
-                    <!-- Specs Quick View -->
-                    <div class="specs-quick">
-                        <h3>Specifiche principali</h3>
-                        <div class="specs-grid" id="specsQuick">
-                            <!-- Generated dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Product Details Tabs -->
-        <section class="product-details-section">
-            <div class="product-details-container">
-                <div class="tabs-navigation">
-                    <button class="tab-btn active" data-tab="overview">Panoramica</button>
-                    <button class="tab-btn" data-tab="specs">Specifiche</button>
-                    <button class="tab-btn" data-tab="reviews">Recensioni</button>
-                </div>
-
-                <div class="tabs-content">
-                    <!-- Overview Tab -->
-                    <div class="tab-panel active" id="overview">
-                        <h2>Panoramica del prodotto</h2>
-                        <div class="overview-content" id="overviewContent">
-                            <p>Questo PC gaming è progettato per offrirti le massime prestazioni in ogni situazione.</p>
-                        </div>
-                    </div>
-
-                    <!-- Specs Tab -->
-                    <div class="tab-panel" id="specs">
-                        <h2>Specifiche tecniche complete</h2>
-                        <div class="specs-table" id="specsTable">
-                            <!-- Generated dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Reviews Tab -->
-                    <div class="tab-panel" id="reviews">
-                        <h2>Recensioni clienti</h2>
-                        <div class="reviews-container" id="reviewsContainer">
-                            <p>Nessuna recensione disponibile.</p>
-                        </div>
-                        <a href="#" class="btn-write-review" id="writeReviewBtn">Scrivi una recensione</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Related Products -->
-        <section class="related-products-section">
-            <div class="related-container">
-                <h2>Prodotti correlati</h2>
-                <div class="related-grid" id="relatedProducts">
-                    <!-- Generated dynamically -->
-                </div>
+            <div class="product-detail">
+                <p style="text-align:center; padding:40px; color:#666;">Caricamento prodotto...</p>
             </div>
         </section>
     </main>
@@ -223,11 +135,11 @@
         <div class="cart-content" id="cartContent"></div>
     </div>
 
-   <!-- API Client -->
-<script src="js/api.js"></script>
-
-<!-- Script esistenti -->
-<script src="js/script.js"></script>
-<script src="js/product.js"></script>
+    <!-- ORDINE CORRETTO DEGLI SCRIPT -->
+    <!-- 1. Carica PRIMA script.js (inizializza cart) -->
+    <script src="js/script.js"></script>
+    
+    <!-- 2. POI carica product.js (usa il cart già inizializzato) -->
+    <script src="js/product.js"></script>
 </body>
 </html>

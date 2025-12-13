@@ -1,6 +1,6 @@
 // ==================== PRODUCTS DATABASE CON ID ====================
 const DEFAULT_PRODUCTS = [{
-        id: "prod-0" + Math.floor(Math.random() * 9 + 1),
+        id: "prod-01",
         name: "ORION",
         price: 1499.49,
         discountPrice: 1299.99,
@@ -16,10 +16,9 @@ const DEFAULT_PRODUCTS = [{
             storage: "1TB NVMe Gen4",
             psu: "850W 80+ Gold"
         }
-
     },
     {
-        id: 'prod-002',
+        id: 'prod-02',
         name: "NOVA",
         price: 2999.99,
         discountPrice: 2699.99,
@@ -37,7 +36,7 @@ const DEFAULT_PRODUCTS = [{
         }
     },
     {
-        id: 'prod-003',
+        id: 3,
         name: "QUANTUM",
         price: 2299.99,
         discountPrice: null,
@@ -55,7 +54,7 @@ const DEFAULT_PRODUCTS = [{
         }
     },
     {
-        id: 'prod-004',
+        id: 4,
         name: "NEBULA",
         price: 1299.99,
         discountPrice: 1099.99,
@@ -73,7 +72,7 @@ const DEFAULT_PRODUCTS = [{
         }
     },
     {
-        id: 'prod-005',
+        id: 5,
         name: "Delta",
         price: 1799.99,
         discountPrice: null,
@@ -91,7 +90,7 @@ const DEFAULT_PRODUCTS = [{
         }
     },
     {
-        id: 'prod-006',
+        id: 6,
         name: "SOLIS",
         price: 3299.99,
         discountPrice: 2999.99,
@@ -108,7 +107,6 @@ const DEFAULT_PRODUCTS = [{
             psu: "1000W 80+ Platinum"
         }
     }
-
 ];
 
 // Inizializza prodotti
@@ -116,6 +114,8 @@ const PRODUCTS = JSON.parse(localStorage.getItem('miraProducts')) || DEFAULT_PRO
 if (!localStorage.getItem('miraProducts')) {
     localStorage.setItem('miraProducts', JSON.stringify(DEFAULT_PRODUCTS));
 }
+
+console.log('Products initialized:', PRODUCTS.map(p => ({name: p.name, id: p.id, type: typeof p.id})));
 
 // ==================== CALCOLA MEDIA RECENSIONI ====================
 function getAverageRating(productId) {
@@ -161,14 +161,14 @@ function displayProducts(products, containerId = 'productsGrid') {
     }
 
     products.forEach(prod => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
+        const card = document.createElement('div');
+        card.className = 'product-card';
 
-                const finalPrice = prod.discount ? prod.discountPrice : prod.price;
-                const avgRating = getAverageRating(prod.id);
-                const reviewCount = getReviewCount(prod.id);
+        const finalPrice = prod.discount ? prod.discountPrice : prod.price;
+        const avgRating = getAverageRating(prod.id);
+        const reviewCount = getReviewCount(prod.id);
 
-                card.innerHTML = `
+        card.innerHTML = `
             ${prod.discount ? '<span class="discount-badge">OFFERTA</span>' : ''}
             <div class="product-image">
                 <img src="${prod.img}" alt="${prod.name}" loading="lazy">
@@ -188,7 +188,8 @@ function displayProducts(products, containerId = 'productsGrid') {
             </div>
         `;
 
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
             window.location.href = `product.html?id=${prod.id}`;
         });
 
@@ -234,7 +235,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
 
         if (totalPages <= 1) return;
 
-        // Previous button
         const prevBtn = document.createElement('button');
         prevBtn.className = 'pagination-arrow';
         prevBtn.innerHTML = '←';
@@ -247,7 +247,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
         });
         paginationEl.appendChild(prevBtn);
 
-        // Page numbers
         for (let i = 1; i <= totalPages; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
@@ -259,7 +258,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
             paginationEl.appendChild(pageBtn);
         }
 
-        // Next button
         const nextBtn = document.createElement('button');
         nextBtn.className = 'pagination-arrow';
         nextBtn.innerHTML = '→';
@@ -284,7 +282,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
         displayPage(1);
     }
 
-    // Filter buttons
     document.querySelectorAll('.filter-category').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.filter-category').forEach(b => b.classList.remove('active'));
@@ -295,7 +292,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
         });
     });
 
-    // Sort dropdown
     const sortSelect = document.getElementById('sortSelect');
     if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
@@ -325,7 +321,6 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
         });
     }
 
-    // Initial display
     updateProductsCount();
     displayPage(1);
 }
@@ -333,10 +328,16 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
 // ==================== PRODUCT DETAIL PAGE ====================
 if (window.location.pathname.includes('product.html')) {
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+    let productId = urlParams.get('id');
+    
+    // Converti a numero se possibile
+    if (!isNaN(parseInt(productId))) {
+        productId = parseInt(productId);
+    }
     
     if (productId) {
-        const product = PRODUCTS.find(p => p.id === productId);
+        // Confronto flessibile che funziona sia con numeri che stringhe
+        const product = PRODUCTS.find(p => p.id == productId);
         
         if (product) {
             const main = document.querySelector('.product-detail');
@@ -389,16 +390,11 @@ if (window.location.pathname.includes('product.html')) {
                                 Aggiungi al carrello
                             </button>
                             
-                            <a href="product-reviews.html?id=${product.id}" class="btn-reviews">
-                                Vedi tutte le recensioni (${reviewCount})
-                            </a>
-                            
                             <a href="pcgaming.html" class="btn-back">← Torna ai prodotti</a>
                         </div>
                     </div>
                 `;
                 
-                // Add to cart functionality
                 document.querySelector('.btn-add-to-cart-detail').addEventListener('click', function() {
                     const productData = JSON.parse(this.dataset.product);
                     
@@ -441,5 +437,4 @@ if (document.getElementById('productsContainer') && window.location.pathname.inc
     } else {
         displayProducts(offerProducts, 'productsContainer');
     }
-    //product.js
 }
