@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contattaci - MIRA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* CONTACT PAGE STYLES */
+        .contact-page {
+            background: #ffffff;
+            padding: 80px 0;
+            min-height: calc(100vh - 72px - 300px);
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .contact-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .contact-subtitle {
+            font-size: 18px;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .contact-grid {
+            max-width: 600px;
+            margin: 0 auto 80px;
+        }
+
+        /* Contact Form */
+        .contact-form-section {
+            background: #f9fafb;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .contact-form-section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #000000;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-submit:hover {
+            background: #1a1a1a;
+        }
+
+        .btn-submit:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .faq-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .faq-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .faq-item.active {
+            border-color: #9ca3af;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px 24px;
+            background: transparent;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000000;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .faq-question:hover {
+            background: #f9fafb;
+        }
+
+        .faq-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+            color: #6b7280;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 24px 20px;
+            color: #4b5563;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contact-page {
+                padding: 60px 0;
+            }
+
+            .contact-title {
+                font-size: 32px;
+            }
+
+            .contact-form-section {
+                padding: 32px 24px;
+            }
+
+            .faq-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center; gap: 32px;">
+                <a href="index.html" class="logo">MIRA</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="pcgaming.html">PC</a></li>
+                        <li><a href="pcgaming.html">Offerte</a></li>
+                        <li><a href="https://discord.gg/NrdB2AmFYB">Discord</a></li>
+                        <li><a href="contattaci.html" class="active">Contattaci</a></li>
+                    </ul>
+                </nav>
+            </div>
+               <!-- Nav Actions -->
+        <div class="nav-actions">
+            <div class="language-selector">
+                <span>Italiano</span>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                </svg>
+            </div>
+
+             <button class="icon-btn" id="accountBtn" aria-label="Account">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="searchBtn" aria-label="Cerca">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="cartBtn" aria-label="Carrello">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+        <div class="search-container">
+            <input type="text" placeholder="Cerca..." class="search-input" id="mainSearchInput">
+            <button class="search-close" id="searchClose">✕</button>
+        </div>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <main class="contact-page">
+        <div class="contact-container">
+            <!-- Header -->
+            <div class="contact-header">
+                <h1 class="contact-title">Contattaci</h1>
+                <p class="contact-subtitle">Hai bisogno di un PC su misura o di un preventivo? Il nostro team è pronto ad aiutarti. Compila il form qui sotto o contattaci direttamente.</p>
+            </div>
+
+            <!-- Contact Grid -->
+            <div class="contact-grid">
+                <!-- Contact Form -->
+                <div class="contact-form-section">
+                    <h2>Invia un Messaggio</h2>
+                    
+                    <div id="formAlert" class="alert"></div>
+
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label class="form-label" for="firstName">Nome *</label>
+                            <input type="text" id="firstName" name="first_name" class="form-input" placeholder="Mario" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="lastName">Cognome *</label>
+                            <input type="text" id="lastName" name="last_name" class="form-input" placeholder="Rossi" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="email">Email *</label>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="mario.rossi@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="message">Messaggio *</label>
+                            <textarea id="message" name="message" class="form-textarea" placeholder="Scrivi qui il tuo messaggio..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">Invia Messaggio</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <div class="faq-header">
+                    <h2 class="faq-title">Domande Frequenti</h2>
+                    <p class="faq-subtitle">Trova rapidamente le risposte alle domande più comuni</p>
+                </div>
+
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Quali sono i tempi di consegna?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                I tempi di consegna variano dai 3 ai 7 giorni lavorativi per i PC contrassegnati come "Pronta Consegna". Per le configurazioni personalizzate, i tempi possono essere di 7-14 giorni lavorativi. Riceverai aggiornamenti via email durante tutto il processo.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Posso personalizzare un PC?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Assolutamente sì! Contattaci via email o Discord con le tue esigenze specifiche e il nostro team ti aiuterà a creare la configurazione perfetta per le tue necessità e il tuo budget.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Che garanzia offrite?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Offriamo 2 anni di garanzia su tutti i nostri PC assemblati. I singoli componenti mantengono la garanzia del produttore (di solito 2-3 anni). Inoltre, forniamo supporto tecnico gratuito per tutto il primo anno.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Accettate resi?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Sì, puoi restituire il prodotto entro 14 giorni dalla ricezione se non è stato utilizzato e si trova nelle condizioni originali. Il rimborso completo verrà effettuato entro 7 giorni lavorativi dalla ricezione del reso.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Come posso pagare?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Accettiamo carta di credito, bonifico bancario, PayPal e pagamento alla consegna (contrassegno). Per ordini personalizzati potrebbe essere richiesto un acconto del 30%.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>I PC vengono testati prima della spedizione?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                Sì, ogni PC viene accuratamente testato per almeno 24 ore con stress test su CPU, GPU, RAM e storage. Installiamo anche tutti i driver necessari e il sistema operativo, se richiesto. Riceverai un report dei test effettuati.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Supporto Clienti</h4>
+                    <ul>
+                        <li><a href="contattaci.html">Contattaci & FAQ</a></li>
+                        <li><a href="mailto:preventivimira1@gmail.com">preventivimira1@gmail.com</a></li>
+                        <li><a href="tel:+393775900298">+39 377 590 0298</a></li>
+                        <li><a href="auth.html">Il tuo Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>About MIRA</h4>
+                    <ul>
+                        <li><a href="#">Chi siamo</a></li>
+                        <li><a href="#">Leggi le recensioni</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://discord.gg/NrdB2AmFYB">Discord</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column footer-brand">
+                    <h4>Creato con il 💜 per il gioco</h4>
+                    <p>Da MIRA rendiamo il gaming su PC semplice e alla portata di tutti.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 - MIRA</p>
+            </div>
+        </div>
+        </footer>
+        
+         <!-- CART SIDEBAR -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Carrello</h3>
+            <button class="cart-close" id="cartClose">✕</button>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <p class="cart-empty">Il tuo carrello è vuoto</p>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html> 
