@@ -2,12 +2,17 @@
 /**
  * MIRA E-Commerce API
  * Contact Form Endpoint - api/contact.php
+ * Richiede autenticazione
  */
 
 require_once 'config.php';
+require_once 'email_helper.php';
 
 $db = Database::getInstance()->getConnection();
 $method = $_SERVER['REQUEST_METHOD'];
+
+// Verifica autenticazione
+$user = JWT::verify();
 
 if ($method !== 'POST') {
     Response::error('Solo richieste POST sono permesse', 405);
@@ -44,35 +49,44 @@ try {
     
     $messageId = $db->lastInsertId();
     
-    // Send email notification
-    $to = SMTP_USER;
-    $subject = "[MIRA] Nuovo messaggio da {$data['first_name']} {$data['last_name']}";
+    // Log: messaggio salvato
+    error_log("MIRA Contact: Messaggio #{$messageId} salvato nel database");
     
-    $emailBody = "
-===========================================
-NUOVO MESSAGGIO DAL SITO MIRA
-===========================================
-
-DATI MITTENTE:
-- Nome: {$data['first_name']} {$data['last_name']}
-- Email: {$data['email']}
-- IP: {$_SERVER['REMOTE_ADDR']}
-
-MESSAGGIO:
--------------------------------------------
-{$data['message']}
--------------------------------------------
-
-Data: " . date('d/m/Y H:i:s') . "
-ID Messaggio: {$messageId}
-    ";
+    // Prepara dati per email
+    $emailData = [
+        'first_name' => $data['first_name'],
+        'last_name' => $data['last_name'],
+        'email' => $data['email'],
+        'message' => $data['message'],
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+    ];
     
-    $headers = "From: {$data['email']}\r\n";
-    $headers .= "Reply-To: {$data['email']}\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
+    // Log: tentativo invio email
+    error_log("MIRA Contact: Tentativo invio email per messaggio #{$messageId}");
     
-    // Send email (funziona solo se server ha SMTP configurato)
-    @mail($to, $subject, $emailBody, $headers);
+    // Invia notifica al team MIRA
+    try {
+        $notificationSent = EmailHelper::sendContactNotification($emailData);
+        if ($notificationSent) {
+            error_log("MIRA Contact: ✅ Notifica inviata al team");
+        } else {
+            error_log("MIRA Contact: ❌ Errore invio notifica al team");
+        }
+    } catch (Exception $e) {
+        error_log("MIRA Contact: ❌ Exception notifica: " . $e->getMessage());
+    }
+    
+    // Invia conferma al mittente
+    try {
+        $confirmationSent = EmailHelper::sendContactConfirmation($emailData);
+        if ($confirmationSent) {
+            error_log("MIRA Contact: ✅ Conferma inviata al mittente");
+        } else {
+            error_log("MIRA Contact: ❌ Errore invio conferma");
+        }
+    } catch (Exception $e) {
+        error_log("MIRA Contact: ❌ Exception conferma: " . $e->getMessage());
+    }
     
     Response::success([
         'message_id' => $messageId
