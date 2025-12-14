@@ -1,10 +1,35 @@
-// Inizializza prodotti
-const PRODUCTS = JSON.parse(localStorage.getItem('miraProducts')) || DEFAULT_PRODUCTS;
-if (!localStorage.getItem('miraProducts')) {
-    localStorage.setItem('miraProducts', JSON.stringify(DEFAULT_PRODUCTS));
-}
+// ==================== CARICA PRODOTTI DA API ====================
+let PRODUCTS = [];
+let isLoading = true;
 
-console.log('Products initialized:', PRODUCTS.map(p => ({name: p.name, id: p.id, type: typeof p.id})));
+async function loadProductsFromAPI() {
+    try {
+        const api = window.MiraAPI;
+        const response = await api.getProducts();
+        
+        if (response.success && response.data.products) {
+            PRODUCTS = response.data.products.map(p => ({
+                id: p.id,
+                name: p.name,
+                desc: p.description,
+                price: parseFloat(p.price),
+                discountPrice: p.is_discount ? parseFloat(p.discount_price) : parseFloat(p.price),
+                discount: p.is_discount,
+                img: p.image_url,
+                tags: p.tags || [],
+                specs: p.specs || {}
+            }));
+            
+            console.log('✅ Prodotti caricati dal database:', PRODUCTS.length);
+            isLoading = false;
+            return PRODUCTS;
+        }
+    } catch (error) {
+        console.error('❌ Errore caricamento prodotti:', error);
+        isLoading = false;
+        return [];
+    }
+}
 
 // ==================== CALCOLA MEDIA RECENSIONI ====================
 function getAverageRating(productId) {
@@ -43,6 +68,11 @@ function displayProducts(products, containerId = 'productsGrid') {
     if (!container) return;
 
     container.innerHTML = '';
+
+    if (isLoading) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#aaa; padding:40px;">Caricamento prodotti...</p>';
+        return;
+    }
 
     if (products.length === 0) {
         container.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#aaa; padding:40px;">Nessun prodotto trovato</p>';
@@ -87,13 +117,22 @@ function displayProducts(products, containerId = 'productsGrid') {
 }
 
 // ==================== INDEX PAGE - SHOW NEW PRODUCTS ====================
-if (document.getElementById('homeProductsGrid')) {
+async function initHomePage() {
+    const homeGrid = document.getElementById('homeProductsGrid');
+    if (!homeGrid) return;
+    
+    await loadProductsFromAPI();
     const newProducts = PRODUCTS.filter(p => p.tags && p.tags.includes('novità')).slice(0, 4);
     displayProducts(newProducts, 'homeProductsGrid');
 }
 
 // ==================== PC GAMING PAGE - FILTERS & PAGINATION ====================
-if (document.getElementById('productsGrid') && window.location.pathname.includes('pcgaming')) {
+async function initPCGamingPage() {
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid || !window.location.pathname.includes('pcgaming')) return;
+    
+    await loadProductsFromAPI();
+    
     let filteredProducts = [...PRODUCTS];
     let currentPage = 1;
     const PRODUCTS_PER_PAGE = 9;
@@ -215,101 +254,104 @@ if (document.getElementById('productsGrid') && window.location.pathname.includes
 }
 
 // ==================== PRODUCT DETAIL PAGE ====================
-if (window.location.pathname.includes('product.html')) {
+async function initProductDetailPage() {
+    if (!window.location.pathname.includes('product.html')) return;
+    
     const urlParams = new URLSearchParams(window.location.search);
     let productId = urlParams.get('id');
     
-    // Converti a numero se possibile
+    if (!productId) {
+        window.location.href = 'notfound.html';
+        return;
+    }
+    
+    await loadProductsFromAPI();
+    
     if (!isNaN(parseInt(productId))) {
         productId = parseInt(productId);
     }
     
-    if (productId) {
-        // Confronto flessibile che funziona sia con numeri che stringhe
-        const product = PRODUCTS.find(p => p.id == productId);
-        
-        if (product) {
-            const main = document.querySelector('.product-detail');
-            if (main) {
-                const finalPrice = product.discount ? product.discountPrice : product.price;
-                const avgRating = getAverageRating(product.id);
-                const reviewCount = getReviewCount(product.id);
-                
-                main.innerHTML = `
-                    <div class="product-detail-container">
-                        <div class="product-detail-images">
-                            <div class="main-image">
-                                <img src="${product.img}" alt="${product.name}">
+    const product = PRODUCTS.find(p => p.id == productId);
+    
+    if (product) {
+        const main = document.querySelector('.product-detail');
+        if (main) {
+            const finalPrice = product.discount ? product.discountPrice : product.price;
+            const avgRating = getAverageRating(product.id);
+            const reviewCount = getReviewCount(product.id);
+            
+            main.innerHTML = `
+                <div class="product-detail-container">
+                    <div class="product-detail-images">
+                        <div class="main-image">
+                            <img src="${product.img}" alt="${product.name}">
+                        </div>
+                    </div>
+                    
+                    <div class="product-detail-info">
+                        <h1>${product.name}</h1>
+                        
+                        <div class="product-rating-detail">
+                            ${createStarRating(avgRating, reviewCount)}
+                            <span class="rating-text">
+                                ${avgRating > 0 ? `${avgRating.toFixed(1)} stelle` : 'Nessuna recensione'}
+                            </span>
+                        </div>
+                        
+                        <p class="product-detail-desc">${product.desc}</p>
+                        
+                        <div class="product-options">
+                            <h3>Specifiche Tecniche</h3>
+                            <div class="specs-list">
+                                ${Object.entries(product.specs).map(([key, value]) => `
+                                    <div class="spec-item">
+                                        <strong>${key.toUpperCase()}:</strong> ${value}
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
                         
-                        <div class="product-detail-info">
-                            <h1>${product.name}</h1>
-                            
-                            <div class="product-rating-detail">
-                                ${createStarRating(avgRating, reviewCount)}
-                                <span class="rating-text">
-                                    ${avgRating > 0 ? `${avgRating.toFixed(1)} stelle` : 'Nessuna recensione'}
-                                </span>
-                            </div>
-                            
-                            <p class="product-detail-desc">${product.desc}</p>
-                            
-                            <div class="product-options">
-                                <h3>Specifiche Tecniche</h3>
-                                <div class="specs-list">
-                                    ${Object.entries(product.specs).map(([key, value]) => `
-                                        <div class="spec-item">
-                                            <strong>${key.toUpperCase()}:</strong> ${value}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            
-                            <div class="product-detail-price">
-                                ${product.discount ? `
-                                    <span class="original-price">€${product.price.toFixed(2)}</span>
-                                    <span class="current-price">€${product.discountPrice.toFixed(2)}</span>
-                                ` : `
-                                    <span class="current-price">€${product.price.toFixed(2)}</span>
-                                `}
-                            </div>
-                            
-                            <button class="btn-add-to-cart-detail" data-product='${JSON.stringify({id: product.id, name: product.name, price: finalPrice, img: product.img, desc: product.desc})}'>
-                                Aggiungi al carrello
-                            </button>
-                            
-                            <a href="pcgaming.html" class="btn-back">← Torna ai prodotti</a>
+                        <div class="product-detail-price">
+                            ${product.discount ? `
+                                <span class="original-price">€${product.price.toFixed(2)}</span>
+                                <span class="current-price">€${product.discountPrice.toFixed(2)}</span>
+                            ` : `
+                                <span class="current-price">€${product.price.toFixed(2)}</span>
+                            `}
                         </div>
+                        
+                        <button class="btn-add-to-cart-detail" data-product='${JSON.stringify({id: product.id, name: product.name, price: finalPrice, img: product.img, desc: product.desc})}'>
+                            Aggiungi al carrello
+                        </button>
+                        
+                        <a href="pcgaming.html" class="btn-back">← Torna ai prodotti</a>
                     </div>
-                `;
+                </div>
+            `;
+            
+            document.querySelector('.btn-add-to-cart-detail').addEventListener('click', function() {
+                const productData = JSON.parse(this.dataset.product);
                 
-                document.querySelector('.btn-add-to-cart-detail').addEventListener('click', function() {
-                    const productData = JSON.parse(this.dataset.product);
-                    
-                    const existing = cartObj.cart.find(p => p.id === productData.id);
-                    if (existing) {
-                        existing.qty += 1;
-                    } else {
-                        cartObj.cart.push({ ...productData, qty: 1 });
-                    }
-                    
-                    cartObj.saveCart();
-                    cartObj.updateCart();
-                    
-                    const cartSidebar = document.getElementById('cartSidebar');
-                    if (cartSidebar) cartSidebar.classList.add('active');
-                    
-                    this.textContent = '✓ Aggiunto al carrello';
-                    this.style.background = '#27ae60';
-                    setTimeout(() => {
-                        this.textContent = 'Aggiungi al carrello';
-                        this.style.background = '';
-                    }, 1500);
-                });
-            }
-        } else {
-            window.location.href = 'notfound.html';
+                const existing = cartObj.cart.find(p => p.id === productData.id);
+                if (existing) {
+                    existing.qty += 1;
+                } else {
+                    cartObj.cart.push({ ...productData, qty: 1 });
+                }
+                
+                cartObj.saveCart();
+                cartObj.updateCart();
+                
+                const cartSidebar = document.getElementById('cartSidebar');
+                if (cartSidebar) cartSidebar.classList.add('active');
+                
+                this.textContent = '✓ Aggiunto al carrello';
+                this.style.background = '#27ae60';
+                setTimeout(() => {
+                    this.textContent = 'Aggiungi al carrello';
+                    this.style.background = '';
+                }, 1500);
+            });
         }
     } else {
         window.location.href = 'notfound.html';
@@ -317,13 +359,39 @@ if (window.location.pathname.includes('product.html')) {
 }
 
 // ==================== OFFERTE PAGE ====================
-if (document.getElementById('productsContainer') && window.location.pathname.includes('offerte')) {
+async function initOffertePage() {
+    const offersGrid = document.getElementById('productsContainer');
+    if (!offersGrid || !window.location.pathname.includes('offerte')) return;
+    
+    await loadProductsFromAPI();
     const offerProducts = PRODUCTS.filter(p => p.discount);
     
     if (offerProducts.length === 0) {
-        document.getElementById('productsContainer').innerHTML = 
-            '<p style="text-align:center; color:#aaa; padding:40px; grid-column:1/-1;">Nessuna offerta disponibile al momento</p>';
+        offersGrid.innerHTML = '<p style="text-align:center; color:#aaa; padding:40px; grid-column:1/-1;">Nessuna offerta disponibile al momento</p>';
     } else {
         displayProducts(offerProducts, 'productsContainer');
     }
 }
+
+// ==================== AUTO INIT ====================
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🚀 Inizializzazione pagine...');
+    
+    if (document.getElementById('homeProductsGrid')) {
+        await initHomePage();
+    }
+    
+    if (document.getElementById('productsGrid') && window.location.pathname.includes('pcgaming')) {
+        await initPCGamingPage();
+    }
+    
+    if (window.location.pathname.includes('product.html')) {
+        await initProductDetailPage();
+    }
+    
+    if (document.getElementById('productsContainer') && window.location.pathname.includes('offerte')) {
+        await initOffertePage();
+    }
+    
+    console.log('✅ Inizializzazione completata');
+});

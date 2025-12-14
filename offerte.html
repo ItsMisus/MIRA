@@ -9,49 +9,52 @@
 </head>
 
 <body>
-    <!-- HEADER -->
-    <header class="header">
-        <div class="nav-container">
+  <!-- HEADER COMPATTO - USA QUESTO IN TUTTE LE PAGINE -->
+<header class="header">
+    <div class="nav-container">
+        <!-- Logo + Nav insieme -->
+        <div style="display: flex; align-items: center; gap: 32px;">
             <a href="index.html" class="logo">MIRA</a>
-            <div class="nav-divider"></div>
-
+            
             <nav>
                 <ul class="nav-links">
                     <li><a href="pcgaming.html">PC</a></li>
-                    <li><a href="offerte.html" class="active">Offerte</a></li>
+                    <li><a href="offerte.html">Offerte</a></li>
                     <li><a href="chisiamo.html">Chi siamo</a></li>
                     <li><a href="discord.html">Community</a></li>
                 </ul>
             </nav>
-
-            <div class="nav-actions">
-                <div class="language-selector">
-                    <span>Italiano</span>
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
-                    </svg>
-                </div>
-
-                <button class="icon-btn" aria-label="Account">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
-                    </svg>
-                </button>
-
-                <button class="icon-btn" id="searchBtn" aria-label="Cerca">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                    </svg>
-                </button>
-
-                <button class="icon-btn" id="cartBtn" aria-label="Carrello">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                    </svg>
-                </button>
-            </div>
         </div>
-    </header>
+
+        <!-- Nav Actions -->
+        <div class="nav-actions">
+            <div class="language-selector">
+                <span>Italiano</span>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                </svg>
+            </div>
+
+            <button class="icon-btn" aria-label="Account">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="searchBtn" aria-label="Cerca">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="cartBtn" aria-label="Carrello">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
 
     <!-- SEARCH OVERLAY -->
     <div class="search-overlay" id="searchOverlay">
@@ -100,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="products-grid" id="offersGrid">
+            <div class="products-grid" id="productsContainer">
                 <!-- Products loaded dynamically -->
             </div>
 
@@ -142,7 +145,7 @@
                         </svg>
                     </div>
                     <h3>Sicurezza</h3>
-                    <p>La sicurezza prima di tutto, i pc verranno spediti con alte misure di sicurezza per evitare qualsiasi probkema alla componentistica..</p>
+                    <p>La sicurezza prima di tutto, i pc verranno spediti con alte misure di sicurezza per evitare qualsiasi problema alla componentistica.</p>
                 </div>
 
                 <div class="feature">
@@ -233,175 +236,9 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- SCRIPTS - Usa product.js per gestire le offerte -->
+    <script src="js/api.js"></script>
     <script src="js/script.js"></script>
-    <script>
-        // Load offers products
-        document.addEventListener('DOMContentLoaded', () => {
-                    const offersGrid = document.getElementById('offersGrid');
-                    const offersCount = document.getElementById('offersCount');
-                    const sortSelect = document.getElementById('sortSelect');
-
-                    if (!offersGrid) return;
-
-                    const PRODUCTS_PER_PAGE = 9;
-                    let allOffers = [];
-                    let currentPage = 1;
-
-                    // Get products from localStorage
-                    const products = JSON.parse(localStorage.getItem('miraProducts')) || [];
-                    allOffers = products.filter(p => p.discount);
-
-                    function getAverageRating(productId) {
-                        const reviews = JSON.parse(localStorage.getItem('miraReviews') || '{}');
-                        const productReviews = reviews[productId] || [];
-                        if (productReviews.length === 0) return 0;
-                        const sum = productReviews.reduce((acc, review) => acc + review.rating, 0);
-                        return sum / productReviews.length;
-                    }
-
-                    function getReviewCount(productId) {
-                        const reviews = JSON.parse(localStorage.getItem('miraReviews') || '{}');
-                        return (reviews[productId] || []).length;
-                    }
-
-                    function displayOffers(page) {
-                        const start = (page - 1) * PRODUCTS_PER_PAGE;
-                        const end = start + PRODUCTS_PER_PAGE;
-                        const pageOffers = allOffers.slice(start, end);
-
-                        offersGrid.innerHTML = '';
-
-                        if (pageOffers.length === 0) {
-                            offersGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#6b7280; padding:80px 20px;">Nessuna offerta disponibile al momento. Torna presto per nuovi sconti!</p>';
-                            return;
-                        }
-
-                        pageOffers.forEach(product => {
-                                    const avgRating = getAverageRating(product.id);
-                                    const reviewCount = getReviewCount(product.id);
-                                    const discountPercent = Math.round(((product.price - product.discountPrice) / product.price) * 100);
-
-                                    const card = document.createElement('div');
-                                    card.className = 'product-card';
-                                    card.innerHTML = `
-                        <span class="discount-badge">-${discountPercent}%</span>
-                        <div class="product-image">
-                            <img src="${product.img}" alt="${product.name}" loading="lazy">
-                        </div>
-                        <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p class="product-desc">${product.desc}</p>
-                            <div class="product-rating">
-                                <div class="stars">
-                                    ${[1, 2, 3, 4, 5].map(star => 
-                                        `<span class="star ${star <= Math.round(avgRating) ? 'filled' : ''}">★</span>`
-                                    ).join('')}
-                                </div>
-                                <span class="rating-count">(${reviewCount})</span>
-                            </div>
-                            <div class="product-price">
-                                <span class="original-price">€${product.price.toFixed(2)}</span>
-                                <span class="current-price">€${product.discountPrice.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    `;
-
-                    card.addEventListener('click', () => {
-                        window.location.href = `product.html?id=${product.id}`;
-                    });
-
-                    offersGrid.appendChild(card);
-                });
-
-                updatePagination(page);
-            }
-
-            function updatePagination(page) {
-                let paginationDiv = document.getElementById('pagination');
-                if (!paginationDiv) return;
-
-                const totalPages = Math.ceil(allOffers.length / PRODUCTS_PER_PAGE);
-                paginationDiv.innerHTML = '';
-
-                if (totalPages <= 1) return;
-
-                const prevBtn = document.createElement('button');
-                prevBtn.className = 'pagination-arrow';
-                prevBtn.innerHTML = '←';
-                prevBtn.disabled = page === 1;
-                prevBtn.addEventListener('click', () => {
-                    displayOffers(page - 1);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-                paginationDiv.appendChild(prevBtn);
-
-                for (let i = 1; i <= totalPages; i++) {
-                    const pageBtn = document.createElement('button');
-                    pageBtn.className = `page-number ${i === page ? 'active' : ''}`;
-                    pageBtn.textContent = i;
-                    pageBtn.addEventListener('click', () => {
-                        displayOffers(i);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    });
-                    paginationDiv.appendChild(pageBtn);
-                }
-
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'pagination-arrow';
-                nextBtn.innerHTML = '→';
-                nextBtn.disabled = page === totalPages;
-                nextBtn.addEventListener('click', () => {
-                    displayOffers(page + 1);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-                paginationDiv.appendChild(nextBtn);
-
-                currentPage = page;
-            }
-
-            // Sort functionality
-            if (sortSelect) {
-                sortSelect.addEventListener('change', (e) => {
-                    const sortValue = e.target.value;
-                    
-                    switch(sortValue) {
-                        case 'discount-desc':
-                            allOffers.sort((a, b) => {
-                                const discountA = ((a.price - a.discountPrice) / a.price) * 100;
-                                const discountB = ((b.price - b.discountPrice) / b.price) * 100;
-                                return discountB - discountA;
-                            });
-                            break;
-                        case 'price-asc':
-                            allOffers.sort((a, b) => a.discountPrice - b.discountPrice);
-                            break;
-                        case 'price-desc':
-                            allOffers.sort((a, b) => b.discountPrice - a.discountPrice);
-                            break;
-                        default:
-                            // Reset to original order
-                            allOffers = products.filter(p => p.discount);
-                    }
-                    
-                    displayOffers(1);
-                });
-            }
-
-            // Update count
-            if (offersCount) {
-                offersCount.textContent = `${allOffers.length} ${allOffers.length === 1 ? 'offerta' : 'offerte'}`;
-            }
-
-            // Initial display
-            displayOffers(1);
-        });
-    </script>
-    <!-- API Client -->
-<script src="js/api.js"></script>
-
-<!-- Script esistenti -->
-<script src="js/script.js"></script>
-<script src="js/product.js"></script>
+    <script src="js/product.js"></script>
 </body>
 </html>
