@@ -1,7 +1,8 @@
 // ==================== CART MANAGEMENT ====================
 let cartObj = {
     cart: [],
-    updateCart: function() {}
+    updateCart: function() {},
+    saveCart: function() {}
 };
 
 function initCart() {
@@ -9,6 +10,14 @@ function initCart() {
     
     function saveCart() {
         localStorage.setItem('miraCart', JSON.stringify(cart));
+        
+        // Sync with server if authenticated
+        const token = localStorage.getItem('miraToken');
+        if (token && window.MiraAPI) {
+            syncCartWithServer().catch(err => {
+                console.error('Errore sincronizzazione carrello:', err);
+            });
+        }
     }
     
     function updateCart() {
@@ -74,6 +83,29 @@ function initCart() {
     updateCart();
     cartObj = { cart, updateCart, saveCart };
     return cartObj;
+}
+
+// ==================== SYNC CART WITH SERVER ====================
+async function syncCartWithServer() {
+    const token = localStorage.getItem('miraToken');
+    if (!token || !window.MiraAPI) return;
+
+    try {
+        const localCart = JSON.parse(localStorage.getItem('miraCart') || '[]');
+        
+        if (localCart.length > 0) {
+            // Sync local to server
+            for (const item of localCart) {
+                try {
+                    await window.MiraAPI.addToCart(item.id, item.qty);
+                } catch (error) {
+                    console.error('Error syncing item:', item.id, error);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error syncing cart:', error);
+    }
 }
 
 // ==================== SEARCH FUNCTIONALITY ====================
@@ -332,6 +364,36 @@ function changeLanguage(lang) {
     // Qui potresti aggiungere la logica per cambiare effettivamente la lingua del sito
 }
 
+// ==================== ACCOUNT BUTTON ====================
+function initAccountButton() {
+    const accountBtn = document.getElementById('accountBtn');
+    if (!accountBtn) return;
+    
+    // Check if user is logged in
+    const token = localStorage.getItem('miraToken');
+    const user = localStorage.getItem('miraUser');
+    
+    if (token && user) {
+        // User is logged in - highlight button
+        accountBtn.style.borderColor = '#9b59b6';
+        const svg = accountBtn.querySelector('svg');
+        if (svg) {
+            svg.style.fill = '#9b59b6';
+        }
+        accountBtn.title = 'Il mio Account';
+    } else {
+        // User is not logged in
+        accountBtn.title = 'Accedi / Registrati';
+    }
+    
+    // Navigate to auth page
+    accountBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        window.location.href = 'auth.html';
+    });
+}
+
 // ==================== PAGINA RISULTATI ====================
 if (window.location.pathname.includes('risultati.html')) {
     document.addEventListener('DOMContentLoaded', () => {
@@ -465,6 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSearch();
     initLanguageSelector();
     initCartSidebar();
+    initAccountButton();
     
     // Search inline nella pagina 404
     const searchInputNotFound = document.getElementById('searchInputNotFound');
@@ -491,6 +554,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Carica lingua salvata
     const savedLang = localStorage.getItem('miraLanguage') || 'it';
     changeLanguage(savedLang);
+    
+    // Sync cart with server if authenticated
+    const token = localStorage.getItem('miraToken');
+    if (token) {
+        setTimeout(() => {
+            syncCartWithServer().catch(err => {
+                console.error('Errore sincronizzazione iniziale carrello:', err);
+            });
+        }, 500);
+    }
     
     console.log('MIRA: All systems initialized');
 });

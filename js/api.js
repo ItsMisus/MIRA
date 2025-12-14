@@ -134,7 +134,7 @@ class MiraAPI {
             body: JSON.stringify({ action: 'login', email, password })
         });
         
-        if (response.data.token) {
+        if (response.success && response.data.token) {
             this.token = response.data.token;
             localStorage.setItem('miraToken', this.token);
             localStorage.setItem('miraUser', JSON.stringify(response.data.user));
@@ -144,10 +144,18 @@ class MiraAPI {
     }
 
     async register(userData) {
-        return this.request('auth.php', {
+        const response = await this.request('auth.php', {
             method: 'POST',
             body: JSON.stringify({ action: 'register', ...userData })
         });
+        
+        if (response.success && response.data.token) {
+            this.token = response.data.token;
+            localStorage.setItem('miraToken', this.token);
+            localStorage.setItem('miraUser', JSON.stringify(response.data.user));
+        }
+        
+        return response;
     }
 
     logout() {
@@ -184,7 +192,6 @@ if (typeof window !== 'undefined') {
 
 // ==================== HELPER FUNCTIONS ====================
 
-
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card';
@@ -219,37 +226,157 @@ function createProductCard(product) {
         </div>
     `;
 
-    const productIdToUse = product.id;
-    
     card.addEventListener('click', () => {
-        console.log('Navigating to product:', productIdToUse);
-         window.location.href = `product.html?id=${product.id}`;
+        window.location.href = `product.html?id=${product.id}`;
     });
 
     return card;
 }
 
-
 // ==================== AUTO-INITIALIZE ====================
 document.addEventListener('DOMContentLoaded', () => {
     initializeHeader();
-    
-  // TEMPORANEAMENTE DISABILITATO - USA product.js
-    /*
-    const homeGrid = document.getElementById('homeProductsGrid');
-    if (homeGrid) {
-        displayProductsFromAPI('homeProductsGrid', { featured: 'true', limit: 4 });
-    }
-    */
-    }
-    
+});
 
+function initializeHeader() {
+    // Update account button based on auth status
+    const accountBtn = document.getElementById('accountBtn');
+    if (accountBtn) {
+        const user = api.getCurrentUser();
+        
+        if (user) {
+            // User is logged in - highlight button
+            accountBtn.style.borderColor = '#9b59b6';
+            const svg = accountBtn.querySelector('svg');
+            if (svg) {
+                svg.style.fill = '#9b59b6';
+            }
+            accountBtn.title = 'Il mio Account';
+        } else {
+            accountBtn.title = 'Accedi / Registrati';
+        }
+        
+        // Navigate to auth page
+        accountBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = 'auth.html';
+        });
+    }
+}
+
+// ==================== CART SYNCHRONIZATION ====================
+
+async function syncCartWithServer() {
+    const token = localStorage.getItem('miraToken');
+    if (!token) return;
+
+    try {
+        // Get local cart
+        const localCart = JSON.parse(localStorage.getItem('miraCart') || '[]');
+        
+        if (localCart.length > 0) {
+            // Sync local cart to server
+            console.log('🔄 Sincronizzazione carrello locale → server...');
+            
+            for (const item of localCart) {
+                try {
+                    await api.addToCart(item.id, item.qty);
+                } catch (error) {
+                    console.error('❌ Errore sincronizzazione item:', item.id, error);
+                }
+            }
+            
+            console.log('✅ Carrello sincronizzato con il server');
+        } else {
+            // Load server cart if local is empty
+            const serverCart = await api.getCart();
+            
+            if (serverCart.success && serverCart.data.items && serverCart.data.items.length > 0) {
+                console.log('📥 Caricamento carrello dal server...');
+                
+                // Convert server cart format to local format
+                const converted = serverCart.data.items.map(item => ({
+                    id: item.product_id,
+                    name: item.product_name,
+                    price: item.unit_price,
+                    img: item.image_url,
+                    qty: item.quantity,
+                    desc: ''
+                }));
+                
+                localStorage.setItem('miraCart', JSON.stringify(converted));
+                console.log('✅ Carrello caricato dal server');
+            }
+        }
+        
+        // Update cart display
+        if (window.cartObj && window.cartObj.updateCart) {
+            window.cartObj.updateCart();
+        }
+        
+    } catch (error) {
+        console.error('❌ Errore sincronizzazione carrello:', error);
+    }
+}
+
+// Auto-sync cart on page load if user is authenticated
+document.addEventListener('DOMContentLoaded', () => {
+    const token = localStorage.getItem('miraToken');
+    if (token) {
+        setTimeout(syncCartWithServer, 500);
+    }
+});
+
+// ==================== INTERCEPT CART OPERATIONS ====================
+
+function interceptCartOperations() {
+    // Store original functions
+    const originalSaveCart = window.cartObj?.saveCart;
     
-);
+    if (window.cartObj) {
+        // Override saveCart to also sync with server
+        window.cartObj.saveCart = function() {
+            // First save locally
+            if (originalSaveCart) {
+                originalSaveCart.call(this);
+            }
+            
+            // Then sync with server if authenticated
+            const token = localStorage.getItem('miraToken');
+            if (token) {
+                syncCartWithServer().catch(err => {
+                    console.error('Errore sincronizzazione automatica:', err);
+                });
+            }
+        };
+    }
+}
+
+// Initialize interceptors after cart is ready
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(interceptCartOperations, 1000);
+});
+
+// ==================== CART HELPER FUNCTIONS ====================
+
 window.updateCartQuantity = async (itemId, quantity) => {
     try {
-        await api.updateCartItem(itemId, quantity);
-        await loadCartItems();
+        // Update locally first
+        if (window.cartObj && window.cartObj.cart) {
+            const item = window.cartObj.cart.find(i => i.id === itemId);
+            if (item) {
+                item.qty = quantity;
+                window.cartObj.saveCart();
+                window.cartObj.updateCart();
+            }
+        }
+        
+        // Then sync with server if authenticated
+        const token = localStorage.getItem('miraToken');
+        if (token) {
+            await api.updateCartItem(itemId, quantity);
+        }
     } catch (error) {
         console.error('Error updating cart:', error);
     }
@@ -257,13 +384,28 @@ window.updateCartQuantity = async (itemId, quantity) => {
 
 window.removeFromCart = async (itemId) => {
     try {
-        await api.removeFromCart(itemId);
-        await loadCartItems();
+        // Remove locally first
+        if (window.cartObj && window.cartObj.cart) {
+            const index = window.cartObj.cart.findIndex(i => i.id === itemId);
+            if (index !== -1) {
+                window.cartObj.cart.splice(index, 1);
+                window.cartObj.saveCart();
+                window.cartObj.updateCart();
+            }
+        }
+        
+        // Then sync with server if authenticated
+        const token = localStorage.getItem('miraToken');
+        if (token) {
+            await api.removeFromCart(itemId);
+        }
     } catch (error) {
         console.error('Error removing from cart:', error);
     }
 };
 
+// ==================== MODULE EXPORT ====================
+
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { MiraAPI, api, displayProductsFromAPI, loadProductFromAPI };
+    module.exports = { MiraAPI, api, createProductCard, syncCartWithServer };
 }
