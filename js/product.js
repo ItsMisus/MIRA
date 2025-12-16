@@ -320,7 +320,7 @@ async function initProductDetailPage() {
                             `}
                         </div>
                         
-                        <button class="btn-add-to-cart-detail" data-product='${JSON.stringify({id: product.id, name: product.name, price: finalPrice, img: product.img, desc: product.desc})}'>
+                        <button class="btn-add-to-cart-detail" data-product='${JSON.stringify({id: product.id, name: product.name, price: finalPrice, image_url: product.img, description: product.desc})}'>
                             Aggiungi al carrello
                         </button>
                         
@@ -329,21 +329,16 @@ async function initProductDetailPage() {
                 </div>
             `;
             
+            // USA LA FUNZIONE addToCart di cart.js
             document.querySelector('.btn-add-to-cart-detail').addEventListener('click', function() {
                 const productData = JSON.parse(this.dataset.product);
                 
-                const existing = cartObj.cart.find(p => p.id === productData.id);
-                if (existing) {
-                    existing.qty += 1;
+                // USA LA FUNZIONE addToCart di cart.js
+                if (window.addToCart) {
+                    window.addToCart(productData, 1);
                 } else {
-                    cartObj.cart.push({ ...productData, qty: 1 });
+                    console.error('addToCart non disponibile');
                 }
-                
-                cartObj.saveCart();
-                cartObj.updateCart();
-                
-                const cartSidebar = document.getElementById('cartSidebar');
-                if (cartSidebar) cartSidebar.classList.add('active');
                 
                 this.textContent = '✓ Aggiunto al carrello';
                 this.style.background = '#27ae60';
