@@ -1,6 +1,6 @@
 /**
- * MIRA E-Commerce - Carrello JavaScript SISTEMATO
- * Con apertura automatica e rimozione funzionante ovunque
+ * MIRA E-Commerce - Carrello JavaScript AGGIORNATO
+ * Con apertura automatica e badge dinamico
  */
 
 // ============================================================================
@@ -139,8 +139,6 @@ function addToCart(product, quantity = 1) {
 }
 
 function removeFromCart(productId) {
-    console.log('🗑️ Rimozione prodotto:', productId);
-    
     cart = cart.filter(item => item.id !== productId);
     saveCart();
     renderCart();
@@ -151,12 +149,10 @@ function removeFromCart(productId) {
         removeItemFromServer(productId);
     }
     
-    console.log('✅ Prodotto rimosso, carrello:', cart);
+    console.log('🗑️ Prodotto rimosso');
 }
 
 function updateQuantity(productId, newQuantity) {
-    console.log('🔄 Aggiornamento quantità:', productId, newQuantity);
-    
     const item = cart.find(item => item.id === productId);
     
     if (item) {
@@ -199,7 +195,7 @@ function loadCart() {
 }
 
 // ============================================================================
-// RENDERING CON EVENT DELEGATION
+// RENDERING
 // ============================================================================
 function renderCart() {
     const container = document.getElementById('cartContent');
@@ -221,9 +217,6 @@ function renderCart() {
         container.appendChild(itemEl);
     });
     
-    // ✅ AGGIUNGI EVENT LISTENERS DOPO IL RENDERING
-    setupCartItemListeners();
-    
     // Calcola totale
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     updateCartFooter(total);
@@ -232,88 +225,39 @@ function renderCart() {
 function createCartItem(item) {
     const div = document.createElement('div');
     div.className = 'cart-item';
-    div.dataset.productId = item.id; // ✅ Importante per identificare l'item
+    
+    const description = item.description ? item.description.substring(0, 50) + '...' : '';
     
     div.innerHTML = `
-        <div class="cart-item-top">
-            <div class="cart-item-image">
-                <img src="${item.image_url}" 
-                     alt="${item.name}"
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
-            </div>
-            <div class="cart-item-info">
-                <h4 class="cart-item-name">${item.name}</h4>
-                <p class="cart-item-variant">€${parseFloat(item.price).toFixed(2)}</p>
-            </div>
-            <button class="cart-item-close" data-action="remove" data-id="${item.id}">×</button>
+        <div class="cart-item-image">
+            <img src="${item.image_url}" 
+                 alt="${item.name}"
+                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
         </div>
-        
-        <div class="cart-item-delivery">
-            <svg width="16" height="16" fill="#059669" viewBox="0 0 16 16">
-                <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
-            </svg>
-            <span class="cart-item-delivery-text">Spedizione gratuita</span>
-        </div>
-        
-        <div class="cart-item-actions">
-            <div class="quantity-controls">
-                <button class="quantity-btn" data-action="decrease" data-id="${item.id}">−</button>
-                <span class="quantity-value">${item.quantity}</span>
-                <button class="quantity-btn" data-action="increase" data-id="${item.id}">+</button>
+        <div class="cart-item-details">
+            <h4 class="cart-item-name">${item.name}</h4>
+            ${description ? `<p class="cart-item-desc">${description}</p>` : ''}
+            <div class="cart-item-price">€${parseFloat(item.price).toFixed(2)}</div>
+            <div class="cart-item-quantity">
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
+                    <span class="quantity-value">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                </div>
+                <button class="cart-item-remove" onclick="removeFromCart(${item.id})">Rimuovi</button>
             </div>
-            <button class="cart-item-remove" data-action="remove" data-id="${item.id}">Rimuovi</button>
         </div>
     `;
     
     return div;
 }
 
-// ✅ SETUP EVENT LISTENERS CON EVENT DELEGATION
-function setupCartItemListeners() {
-    const container = document.getElementById('cartContent');
-    if (!container) return;
-    
-    // Rimuovi listener precedenti per evitare duplicati
-    const oldContainer = container.cloneNode(true);
-    container.parentNode.replaceChild(oldContainer, container);
-    
-    // Aggiungi listener con event delegation
-    oldContainer.addEventListener('click', (e) => {
-        const target = e.target.closest('[data-action]');
-        if (!target) return;
-        
-        const action = target.dataset.action;
-        const productId = parseInt(target.dataset.id);
-        
-        console.log('🖱️ Click:', action, 'per prodotto:', productId);
-        
-        switch(action) {
-            case 'increase':
-                const currentItem = cart.find(item => item.id === productId);
-                if (currentItem) {
-                    updateQuantity(productId, currentItem.quantity + 1);
-                }
-                break;
-                
-            case 'decrease':
-                const item = cart.find(item => item.id === productId);
-                if (item && item.quantity > 1) {
-                    updateQuantity(productId, item.quantity - 1);
-                }
-                break;
-                
-            case 'remove':
-                removeFromCart(productId);
-                break;
-        }
-    });
-}
-
 function updateCartFooter(total) {
-    const checkoutPrice = document.querySelector('.cart-checkout-price');
-    if (checkoutPrice) {
-        checkoutPrice.textContent = `€${total.toFixed(2)}`;
-    }
+    // Aggiorna il subtotal in tutte le posizioni
+    const subtotalValues = document.querySelectorAll('.cart-subtotal-value');
+    subtotalValues.forEach(el => {
+        el.textContent = `€${total.toFixed(2)}`;
+    });
 }
 
 function updateCartBadge() {
@@ -404,7 +348,9 @@ async function removeItemFromServer(productId) {
     if (!token || !window.MiraAPI) return;
 
     try {
-        console.log('Server: rimozione non implementata per product_id');
+        // Questo richiede l'item_id, non product_id
+        // Per ora loggiamo solo l'errore
+        console.log('Rimozione item dal server non implementata');
     } catch (error) {
         console.error('Errore rimozione item dal server:', error);
     }
@@ -420,4 +366,4 @@ window.clearCart = clearCart;
 window.openCart = openCart;
 window.closeCart = closeCart;
 
-console.log('✅ Carrello script caricato - Rimozione funzionante ovunque');
+console.log('✅ Carrello script caricato con apertura automatica');

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PC Gaming - MIRA</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/cart.css">
 </head>
 <body>
 <!-- HEADER COMPATTO - USA QUESTO IN TUTTE LE PAGINE -->
@@ -308,7 +307,16 @@
         </div>
     </footer>
 
-
+    <!-- CART SIDEBAR -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Carrello</h3>
+            <button class="cart-close" id="cartClose">✕</button>
+        </div>
+        <div class="cart-content" id="cartContent">
+            <p class="cart-empty">Il tuo carrello è vuoto</p>
+        </div>
+    </div>
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/script.js"></script>

@@ -1,26 +1,87 @@
 // ==================== CART MANAGEMENT ====================
-// NOTA: Il carrello è ora gestito interamente da cart.js
-// Questo oggetto è mantenuto solo per compatibilità con codice legacy
 let cartObj = {
     cart: [],
-    updateCart: function() {
-        // Delega a cart.js se disponibile
-        if (window.renderCart) {
-            window.renderCart();
-        }
-    },
-    saveCart: function() {
-        // Delega a cart.js se disponibile
-        if (window.saveCart) {
-            window.saveCart();
-        }
-    }
+    updateCart: function() {},
+    saveCart: function() {}
 };
 
-// Funzione vuota - il carrello è gestito da cart.js
 function initCart() {
-    console.log('ℹ️ initCart in script.js - carrello gestito da cart.js');
-    // Non fare nulla, cart.js gestisce tutto
+    let cart = JSON.parse(localStorage.getItem('miraCart')) || [];
+    
+    function saveCart() {
+        localStorage.setItem('miraCart', JSON.stringify(cart));
+        
+        // Sync with server if authenticated
+        const token = localStorage.getItem('miraToken');
+        if (token && window.MiraAPI) {
+            syncCartWithServer().catch(err => {
+                console.error('Errore sincronizzazione carrello:', err);
+            });
+        }
+    }
+    
+    function updateCart() {
+        const cartItems = document.getElementById('cartItems');
+        const cartTotalEl = document.getElementById('cartTotal');
+        const cartContent = document.getElementById('cartContent');
+        
+        if (!cartItems && !cartContent) return;
+
+        const container = cartItems || cartContent;
+        container.innerHTML = "";
+        
+        if (cart.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:#aaa; padding:20px;'>Il carrello è vuoto</p>";
+            if (cartTotalEl) cartTotalEl.textContent = '0.00';
+        } else {
+            cart.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display:flex; gap:10px; margin-bottom:15px; background:#222; padding:10px; border-radius:8px; align-items:flex-start;';
+                
+                div.innerHTML = `
+                    <img src="${item.img}" alt="${item.name}" style="width:80px; height:60px; object-fit:cover; border-radius:6px;">
+                    <div style="flex:1;">
+                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#fff;">${item.name}</h4>
+                        <p style="font-size:0.85rem; color:#ccc; margin:3px 0;">€ ${item.price.toFixed(2)}</p>
+                        <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                            <button class="decrease" style="background:#9b59b6; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600;">−</button>
+                            <span style="min-width:20px; text-align:center; font-weight:600; color:#9b59b6;">${item.qty}</span>
+                            <button class="increase" style="background:#9b59b6; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600;">+</button>
+                            <button class="remove" style="background:#e74c3c; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600; margin-left:auto;">✕</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+
+                div.querySelector('.increase').addEventListener('click', () => {
+                    item.qty += 1;
+                    saveCart();
+                    updateCart();
+                });
+                
+                div.querySelector('.decrease').addEventListener('click', () => {
+                    if (item.qty > 1) {
+                        item.qty -= 1;
+                        saveCart();
+                        updateCart();
+                    }
+                });
+                
+                div.querySelector('.remove').addEventListener('click', () => {
+                    cart.splice(index, 1);
+                    saveCart();
+                    updateCart();
+                });
+            });
+            
+            const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+            if (cartTotalEl) cartTotalEl.textContent = total.toFixed(2);
+        }
+    }
+
+    updateCart();
+    cartObj = { cart, updateCart, saveCart };
     return cartObj;
 }
 
@@ -462,7 +523,7 @@ if (window.location.pathname.includes('risultati.html')) {
 
 // ==================== INIT ALL ====================
 document.addEventListener('DOMContentLoaded', () => {
-    // NON inizializzare più initCart() qui - è gestito da cart.js
+    initCart();
     initSearch();
     initLanguageSelector();
     initCartSidebar();

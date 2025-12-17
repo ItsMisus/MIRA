@@ -1326,6 +1326,65 @@ body {
     color: var(--white);
 }
 
+/* ==================== CART SIDEBAR ==================== */
+.cart-sidebar {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100%;
+    background: var(--white);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    z-index: 2000;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+}
+
+.cart-sidebar.active {
+    right: 0;
+}
+
+.cart-header {
+    padding: var(--space-6);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 10;
+}
+
+.cart-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.cart-close {
+    background: transparent;
+    border: none;
+    color: var(--gray-700);
+    font-size: 24px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    border-radius: var(--radius-md);
+}
+
+.cart-close:hover {
+    background: var(--gray-100);
+    color: var(--black);
+}
+
+.cart-content {
+    padding: var(--space-6);
+}
 
 /* ==================== PRODUCT DETAIL PAGE ==================== */
 .product-detail {
@@ -2306,9 +2365,83 @@ body {
     outline: 2px solid #0a0a0a;
     outline-offset: 2px;
 }
+/* ==================== PRODUCT PAGE - NZXT STYLE ==================== */
+/* Product Info */
+.product-info-sticky {
+    position: sticky;
+    top: 100px;
+}
 
+.product-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
 
+.product-rating-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
 
+.stars {
+    display: flex;
+    gap: 4px;
+    color: #fbbf24;
+}
+
+.review-count {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.product-price-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.product-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #000000;
+}
+
+.product-price-original {
+    font-size: 24px;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.product-description {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #4b5563;
+    margin-bottom: 32px;
+}
+
+.btn-add-cart-large {
+    width: 100%;
+    padding: 16px;
+    background: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 32px;
+}
+
+.btn-add-cart-large:hover {
+    background: #1a1a1a;
+}
 
 /* Specs Quick View */
 .specs-quick {
