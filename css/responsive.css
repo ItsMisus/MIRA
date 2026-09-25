@@ -8,6 +8,31 @@ Desktop: > 1024px
 */
 
 /* ==================== BASE RESPONSIVE ==================== */
+
+/* Il pulsante del menu esiste solo sotto i 1024px: le sue regole stanno
+   dentro quel breakpoint, quindi senza questa riga resterebbe visibile
+   anche su desktop, dove la barra di navigazione e' gia' tutta in vista. */
+.mobile-menu-btn {
+    display: none;
+}
+
+/* Con il menu aperto la pagina sotto non deve scorrere. */
+body.menu-open {
+    overflow: hidden;
+}
+
+/* Altezza reale dell'header, un valore solo da cui parte il pannello del
+   menu: scritta a mano in due punti diversi lasciava una striscia scoperta. */
+:root {
+    --mira-header-h: 57px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --mira-header-h: 65px;
+    }
+}
+
 @media (max-width: 1440px) {
     .container,
     .nav-container {
@@ -33,10 +58,13 @@ Desktop: > 1024px
     /* Header Navigation */
     .nav-links {
         position: fixed;
-        top: 72px;
+        top: var(--mira-header-h);
         left: -100%;
         width: 100%;
-        height: calc(100vh - 72px);
+        /* dvh tiene conto della barra del browser che appare e scompare */
+        height: calc(100vh - var(--mira-header-h));
+        height: calc(100dvh - var(--mira-header-h));
+        overflow-y: auto;
         background: rgba(10, 10, 10, 0.98);
         backdrop-filter: blur(10px);
         flex-direction: column;
@@ -161,6 +189,10 @@ Desktop: > 1024px
     .filters-sidebar {
         position: static;
         display: flex;
+        /* style.css sotto i 640px rimette flex-direction: column e annulla
+           la striscia scorrevole proprio sui telefoni: qui va riaffermata. */
+        flex-direction: row;
+        align-items: flex-end;
         gap: 12px;
         overflow-x: auto;
         padding-bottom: 16px;

@@ -878,4 +878,10 @@ body {
     .table-container {
         overflow-x: auto;
     }
+    
+    /* Con width: 100% la tabella si comprime dentro il contenitore invece
+       di scorrere, e otto colonne su un telefono diventano illeggibili. */
+    .data-table {
+        min-width: 720px;
+    }
 }

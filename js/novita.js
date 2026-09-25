@@ -164,6 +164,13 @@ function updateSlider() {
     const track = document.getElementById('novitaSliderTrack');
     if (!track) return;
 
+    // Sotto i 1024px il track scorre da solo (overflow-x: auto): qui non
+    // deve essere spostato, altrimenti litiga con lo scorrimento a dita.
+    if (window.innerWidth <= 1024) {
+        track.style.transform = '';
+        return;
+    }
+
     const cards      = track.querySelectorAll('.product-card-nzxt');
     const totalCards = cards.length;
 
@@ -244,7 +251,7 @@ function injectNovitaStyles() {
             flex-wrap: nowrap !important;
         }
 
-        .novita-slider-wrapper.has-arrow {
+        .novita-slider-wrapper {
             overflow: hidden;
         }
 
@@ -339,6 +346,32 @@ function injectNovitaStyles() {
         @media (max-width: 1024px) {
             .product-card-nzxt { flex: 0 0 250px; }
             .product-image-nzxt { height: 250px; }
+        }
+
+        @media (max-width: 1024px) {
+            .novita-slider-wrapper {
+                overflow-x: auto;
+                overflow-y: hidden;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+
+            .novita-slider-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+
+            .novita-slider-track {
+                transform: none !important;
+            }
+
+            .product-card-nzxt {
+                scroll-snap-align: start;
+            }
+
+            .slider-arrow {
+                display: none !important;
+            }
         }
 
         /* FIX #12: breakpoint mobile → card 200px */

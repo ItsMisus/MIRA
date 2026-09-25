@@ -94,6 +94,46 @@ function initCart() {
     return cartObj;
 }
 
+// ==================== MENU MOBILE ====================
+// Sotto i 1024px responsive.css porta la barra di navigazione fuori dallo
+// schermo e la riporta dentro con .nav-links.active. Il pulsante che deve
+// aggiungere quella classe non esisteva in nessuna pagina e nessuno script
+// la toglieva: sul telefono i link erano semplicemente irraggiungibili.
+function initMobileMenu() {
+    const menuBtn  = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    if (!menuBtn || !navLinks) return;
+
+    function setOpen(open) {
+        menuBtn.classList.toggle('active', open);
+        navLinks.classList.toggle('active', open);
+        document.body.classList.toggle('menu-open', open);
+        menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        menuBtn.setAttribute('aria-label', open ? 'Chiudi il menu' : 'Apri il menu');
+    }
+
+    menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setOpen(!navLinks.classList.contains('active'));
+    });
+
+    // Un link porta a un'altra pagina, ma le ancore no: in quel caso il
+    // menu resterebbe aperto sopra il contenuto.
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => setOpen(false));
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+    });
+
+    // Passando a schermo largo la barra torna orizzontale da sola: se il
+    // menu restasse "aperto" il blocco dello scorrimento rimarrebbe attivo.
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024) setOpen(false);
+    });
+}
+
 // ==================== SEARCH FUNCTIONALITY ====================
 function initSearch() {
     const searchBtn     = document.getElementById('searchBtn');
@@ -430,6 +470,7 @@ if (window.location.pathname.includes('risultati.html')) {
 // ==================== INIT ALL ====================
 document.addEventListener('DOMContentLoaded', () => {
     initCart();
+    initMobileMenu();
     initSearch();
     initLanguageSelector();
     initCartSidebar();

@@ -692,11 +692,9 @@ body {
     }
 }
 
-@media (max-width: 640px) {
-    .nav-links {
-        display: none;
-    }
-}
+/* Sotto i 640px la barra non va nascosta con display: none: a 1024px
+   diventa un pannello che entra da sinistra con .nav-links.active, e
+   display: none lo rendeva irraggiungibile proprio sui telefoni. */
 
 /* ==================== SEARCH OVERLAY - AGGIORNATO ==================== */
 
@@ -1953,11 +1951,9 @@ body {
     }
 }
 
-@media (max-width: 640px) {
-    .nav-links {
-        display: none;
-    }
-}
+/* Sotto i 640px la barra non va nascosta con display: none: a 1024px
+   diventa un pannello che entra da sinistra con .nav-links.active, e
+   display: none lo rendeva irraggiungibile proprio sui telefoni. */
 
 /* Product Detail Responsive */
 @media (max-width: 1024px) {
