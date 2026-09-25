@@ -52,6 +52,11 @@ function getOrCreateCart($db, $userId) {
     $stmt->execute([$userId]);
     $cart = $stmt->fetch();
 
+    if (!$cart) {
+        error_log("Cart non creato per user_id $userId");
+        Response::error('Errore durante la creazione del carrello', 500);
+    }
+
     return $cart['id'];
 }
 
@@ -88,7 +93,11 @@ function getCart($db, $userId) {
         $formatted  = [];
 
         foreach ($items as $item) {
-            $unitPrice = $item['is_discount'] ? (float)$item['discount_price'] : (float)$item['price'];
+            // Stesso motivo di products.php: senza discount_price il flag di
+            // sconto non vale, altrimenti il pezzo finisce in carrello a zero.
+            $unitPrice = ($item['is_discount'] && $item['discount_price'] !== null)
+                ? (float)$item['discount_price']
+                : (float)$item['price'];
             $subtotal  = $unitPrice * (int)$item['quantity'];
 
             $formatted[] = [
@@ -181,7 +190,7 @@ function addToCart($db, $userId, $data) {
         Response::success([
             'item_id'      => $itemId,
             'product_name' => $product['name'],
-            'quantity'     => $quantity
+            'quantity'     => $existing ? $newTotal : $quantity
         ], $message);
 
     } catch (PDOException $e) {

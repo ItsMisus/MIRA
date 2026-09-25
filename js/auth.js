@@ -55,7 +55,7 @@ function initAuthPage() {
                 const response = await window.MiraAPI.login(email, password);
                 
                 if (response.success) {
-                    showAlert('Login effettuato con successo!', 'success');
+                    showAuthAlert('Login effettuato con successo!', 'success');
                     
                     // Sincronizza il carrello locale con quello del server
                     await syncCart();
@@ -67,7 +67,7 @@ function initAuthPage() {
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showAlert(error.message || 'Errore durante il login. Verifica le credenziali.', 'error');
+                showAuthAlert(error.message || 'Errore durante il login. Verifica le credenziali.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Accedi';
             }
@@ -89,7 +89,7 @@ function initAuthPage() {
             
             // Validation
             if (password.length < 6) {
-                showAlert('La password deve essere di almeno 6 caratteri', 'error');
+                showAuthAlert('La password deve essere di almeno 6 caratteri', 'error');
                 return;
             }
             
@@ -110,7 +110,7 @@ function initAuthPage() {
                     localStorage.setItem('miraToken', response.data.token);
                     localStorage.setItem('miraUser', JSON.stringify(response.data.user));
                     
-                    showAlert('Registrazione completata! Reindirizzamento...', 'success');
+                    showAuthAlert('Registrazione completata! Reindirizzamento...', 'success');
                     
                     // Sincronizza carrello
                     await syncCart();
@@ -122,7 +122,7 @@ function initAuthPage() {
                 }
             } catch (error) {
                 console.error('Registration error:', error);
-                showAlert(error.message || 'Errore durante la registrazione. Riprova.', 'error');
+                showAuthAlert(error.message || 'Errore durante la registrazione. Riprova.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Crea Account';
             }
@@ -192,6 +192,12 @@ function updateAccountButton() {
     const accountBtn = document.getElementById('accountBtn');
     if (!accountBtn) return;
     
+    // api.js e script.js montano gia' il listener su questo bottone e usano
+    // lo stesso flag: senza controllarlo qui il click veniva registrato
+    // una terza volta. E il pulsante non ha sempre una svg dentro.
+    if (accountBtn._miraInitialized) return;
+    accountBtn._miraInitialized = true;
+    
     const user = window.MiraAPI.getCurrentUser();
     
     accountBtn.addEventListener('click', () => {
@@ -201,7 +207,8 @@ function updateAccountButton() {
     // Change icon if logged in
     if (user) {
         accountBtn.style.borderColor = '#9b59b6';
-        accountBtn.querySelector('svg').style.color = '#9b59b6';
+        const svg = accountBtn.querySelector('svg');
+        if (svg) svg.style.color = '#9b59b6';
     }
 }
 
@@ -209,7 +216,14 @@ function updateAccountButton() {
 async function syncCart() {
     try {
         // Get local cart
-        const localCart = JSON.parse(localStorage.getItem('miraCart') || '[]');
+        let localCart;
+        try {
+            localCart = JSON.parse(localStorage.getItem('miraCart') || '[]');
+        } catch (error) {
+            console.warn('Carrello locale non leggibile, ignorato', error);
+            localStorage.removeItem('miraCart');
+            localCart = [];
+        }
         
         if (localCart.length === 0) {
             // Load server cart if local is empty
@@ -260,7 +274,7 @@ function handleLogout() {
 }
 
 // ==================== ALERT HELPERS ====================
-function showAlert(message, type) {
+function showAuthAlert(message, type) {
     const alertContainer = document.getElementById('authAlert');
     if (!alertContainer) return;
     
@@ -268,7 +282,7 @@ function showAlert(message, type) {
     
     alertContainer.innerHTML = `
         <div class="alert ${alertClass}">
-            ${message}
+            ${escapeAlertText(message)}
         </div>
     `;
     
@@ -276,6 +290,15 @@ function showAlert(message, type) {
     if (type !== 'success') {
         setTimeout(clearAlert, 5000);
     }
+}
+
+// Il messaggio puo' arrivare dal server e viene inserito con innerHTML.
+function escapeAlertText(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function clearAlert() {

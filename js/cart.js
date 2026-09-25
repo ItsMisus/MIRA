@@ -7,7 +7,21 @@
 // CONFIGURAZIONE
 // ============================================================================
 const CART_API = 'http://localhost/mira_ecommerce/api/cart.php';
-const PRODUCTS_API = 'http://localhost/mira_ecommerce/api/products.php';
+
+// ============================================================================
+// ESCAPE HTML
+// ============================================================================
+// I nomi prodotto arrivano dal database e finiscono dentro innerHTML: senza
+// escape, del markup nel nome viene eseguito come HTML dalla pagina.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 // ============================================================================
 // STATO CARRELLO
@@ -125,6 +139,15 @@ async function loadCart() {
             }
         });
         
+        // Lo stato 401 non compare nel testo dell'errore: va letto qui,
+        // altrimenti un token scaduto resta in localStorage per sempre.
+        if (response.status === 401) {
+            localStorage.removeItem('miraToken');
+            localStorage.removeItem('miraUser');
+            cartData = { items: [], total: 0, itemsCount: 0 };
+            return;
+        }
+        
         const data = await response.json();
         console.log('📦 Risposta server:', data);
         
@@ -144,12 +167,7 @@ async function loadCart() {
     } catch (error) {
         console.error('❌ Errore caricamento carrello:', error);
         
-        // Se errore 401, utente non autenticato
-        if (error.message && error.message.includes('401')) {
-            localStorage.removeItem('miraToken');
-            localStorage.removeItem('miraUser');
-            cartData = { items: [], total: 0, itemsCount: 0 };
-        }
+        cartData = { items: [], total: 0, itemsCount: 0 };
     } finally {
         renderCart();
         updateCartBadge();
@@ -206,6 +224,7 @@ async function addToCart(productId, quantity = 1) {
     } catch (error) {
         console.error('❌ Errore aggiunta al carrello:', error);
         showToast(error.message || 'Errore durante l\'aggiunta al carrello', 'error');
+        throw error;
     }
 }
 
@@ -387,12 +406,12 @@ function createCartItem(item) {
     div.innerHTML = `
         <div class="cart-item-top">
             <div class="cart-item-image">
-                <img src="${item.image_url}" 
-                     alt="${item.product_name}"
+                <img src="${escapeHtml(item.image_url)}" 
+                     alt="${escapeHtml(item.product_name)}"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
             </div>
             <div class="cart-item-info">
-                <h4 class="cart-item-name">${item.product_name}</h4>
+                <h4 class="cart-item-name">${escapeHtml(item.product_name)}</h4>
                 <p class="cart-item-variant">€${parseFloat(item.unit_price).toFixed(2)}</p>
             </div>
             <button class="cart-item-close" onclick="removeFromCart(${item.item_id})" title="Rimuovi">
@@ -432,7 +451,7 @@ function createCartItem(item) {
 function updateCartFooter(total) {
     const checkoutPrice = document.querySelector('.cart-checkout-price');
     if (checkoutPrice) {
-        checkoutPrice.textContent = `€${total.toFixed(2)}`;
+        checkoutPrice.textContent = `€${(Number(total) || 0).toFixed(2)}`;
     }
 }
 

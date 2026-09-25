@@ -19,7 +19,9 @@ switch ($method) {
         break;
     
     case 'DELETE':
-        JWT::verify(); // Solo admin
+        $user = JWT::verify();
+        if (empty($user['is_admin'])) Response::error('Accesso non autorizzato', 403);
+        if (!isset($_GET['id'])) Response::error('ID recensione mancante');
         deleteReview($db, $_GET['id']);
         break;
     
@@ -41,9 +43,14 @@ function getReviews($db, $params) {
             WHERE r.product_id = ? AND r.is_approved = 1
             ORDER BY r.created_at DESC";
     
-    $stmt = $db->prepare($sql);
-    $stmt->execute([$params['product_id']]);
-    $reviews = $stmt->fetchAll();
+    try {
+        $stmt = $db->prepare($sql);
+        $stmt->execute([$params['product_id']]);
+        $reviews = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log("Get reviews error: " . $e->getMessage());
+        Response::error('Errore durante il recupero delle recensioni', 500);
+    }
     
     Response::success($reviews);
 }
@@ -52,6 +59,10 @@ function getReviews($db, $params) {
  * Create new review
  */
 function createReview($db, $data) {
+    if (!is_array($data)) {
+        Response::error('Dati JSON non validi', 400);
+    }
+    
     $errors = [];
     
     if ($error = Validator::required($data['product_id'] ?? '', 'Product ID')) $errors[] = $error;
@@ -68,16 +79,27 @@ function createReview($db, $data) {
         Response::error('Rating deve essere tra 1 e 5');
     }
     
-    $sql = "INSERT INTO reviews (product_id, reviewer_name, rating, comment, is_approved)
-            VALUES (?, ?, ?, ?, 1)";
-    
-    $stmt = $db->prepare($sql);
-    $stmt->execute([
-        $data['product_id'],
-        $data['reviewer_name'],
-        $rating,
-        $data['comment']
-    ]);
+    try {
+        $productStmt = $db->prepare("SELECT id FROM products WHERE id = ? AND is_active = 1");
+        $productStmt->execute([$data['product_id']]);
+        if (!$productStmt->fetch()) {
+            Response::error('Prodotto non trovato', 404);
+        }
+        
+        $sql = "INSERT INTO reviews (product_id, reviewer_name, rating, comment, is_approved)
+                VALUES (?, ?, ?, ?, 1)";
+        
+        $stmt = $db->prepare($sql);
+        $stmt->execute([
+            $data['product_id'],
+            $data['reviewer_name'],
+            $rating,
+            $data['comment']
+        ]);
+    } catch (PDOException $e) {
+        error_log("Create review error: " . $e->getMessage());
+        Response::error("Errore durante l'invio della recensione", 500);
+    }
     
     Response::success(['id' => $db->lastInsertId()], 'Recensione inviata!', 201);
 }
@@ -90,8 +112,13 @@ function deleteReview($db, $id) {
         Response::error('ID recensione mancante');
     }
     
-    $stmt = $db->prepare("DELETE FROM reviews WHERE id = ?");
-    $stmt->execute([$id]);
+    try {
+        $stmt = $db->prepare("DELETE FROM reviews WHERE id = ?");
+        $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        error_log("Delete review error: " . $e->getMessage());
+        Response::error("Errore durante l'eliminazione della recensione", 500);
+    }
     
     if ($stmt->rowCount() === 0) {
         Response::error('Recensione non trovata', 404);

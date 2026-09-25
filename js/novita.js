@@ -102,6 +102,17 @@ function renderNovitaSlider(products, container) {
     }
 }
 
+// Nome e descrizione arrivano dal database e finiscono dentro innerHTML.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function createProductCard(product) {
     const card = document.createElement('div');
     card.className = 'product-card-nzxt';
@@ -109,13 +120,13 @@ function createProductCard(product) {
     card.innerHTML = `
         <a href="product.html?id=${product.id}" class="product-link">
             <div class="product-image-nzxt">
-                <img src="${product.image_url}"
-                     alt="${product.name}"
+                <img src="${escapeHtml(product.image_url)}"
+                     alt="${escapeHtml(product.name)}"
                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22400%22/%3E%3C/svg%3E'">
             </div>
             <div class="product-info-nzxt">
-                <h3 class="product-name-nzxt">${product.name}</h3>
-                <p class="product-desc-nzxt">${product.description ? product.description.substring(0, 60) + '...' : ''}</p>
+                <h3 class="product-name-nzxt">${escapeHtml(product.name)}</h3>
+                <p class="product-desc-nzxt">${product.description ? escapeHtml(product.description.substring(0, 60)) + '...' : ''}</p>
             </div>
         </a>
     `;

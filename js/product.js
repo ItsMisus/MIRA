@@ -7,6 +7,21 @@ const PRODUCTS_API = 'http://localhost/mira_ecommerce/api/products.php';
 let currentProduct = null;
 
 // ============================================================================
+// ESCAPE HTML
+// ============================================================================
+// Nome, descrizione e specifiche finiscono dentro innerHTML: senza escape,
+// del markup salvato a database viene eseguito come HTML dalla pagina.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================================================
 // INIT PAGINA PRODOTTO
 // ============================================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,22 +77,22 @@ function renderProductDetail(product) {
         <div class="product-detail-container">
             <div class="product-detail-images">
                 <div class="main-image">
-                    <img src="${product.image_url}" alt="${product.name}">
+                    <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}">
                 </div>
             </div>
 
             <div class="product-detail-info">
-                <h1>${product.name}</h1>
+                <h1>${escapeHtml(product.name)}</h1>
 
                 <div class="product-rating-detail">
                     ${renderStars(product.avg_rating)}
                     <span class="rating-text">
-                        ${product.avg_rating > 0 ? `${product.avg_rating.toFixed(1)} stelle` : 'Nessuna recensione'}
+                        ${Number(product.avg_rating) > 0 ? `${Number(product.avg_rating).toFixed(1)} stelle` : 'Nessuna recensione'}
                         ${product.review_count > 0 ? `(${product.review_count})` : ''}
                     </span>
                 </div>
 
-                <p class="product-detail-desc">${product.description}</p>
+                <p class="product-detail-desc">${escapeHtml(product.description)}</p>
 
                 ${renderSpecs(product.specs)}
 
@@ -107,7 +122,7 @@ function renderSpecs(specs) {
 
     const specsHTML = Object.entries(specs).map(([key, value]) => `
         <div class="spec-item">
-            <strong>${key.toUpperCase()}:</strong> ${value}
+            <strong>${escapeHtml(key.toUpperCase())}:</strong> ${escapeHtml(value)}
         </div>
     `).join('');
 
@@ -222,11 +237,11 @@ async function initPCGamingPage() {
         card.innerHTML = `
             ${product.is_discount ? '<span class="discount-badge">OFFERTA</span>' : ''}
             <div class="product-image">
-                <img src="${product.image_url}" alt="${product.name}">
+                <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}">
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+                <h3>${escapeHtml(product.name)}</h3>
+                <p class="product-desc">${escapeHtml((product.description || '').substring(0, 80))}...</p>
                 <div class="product-rating">
                     ${renderStars(product.avg_rating)}
                     <span class="rating-count">(${product.review_count})</span>

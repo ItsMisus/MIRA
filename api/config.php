@@ -5,17 +5,33 @@
  * FIX #1: SMTP corretto | FIX #2: JWT verify compatibile Nginx
  */
 
-// Configurazione Database
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'mira_ecommerce');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+/**
+ * Le credenziali si leggono dall'ambiente. In sviluppo XAMPP i default
+ * bastano per il database; SMTP_PASS e JWT_SECRET NON hanno un default
+ * utilizzabile e vanno impostati, altrimenti l'invio email e la firma dei
+ * token falliscono in modo esplicito invece di usare un segreto pubblico.
+ *
+ * Esempio (Apache, httpd.conf o .env caricato dal server):
+ *   SetEnv MIRA_SMTP_PASS "..."
+ *   SetEnv MIRA_JWT_SECRET "..."
+ */
+function mira_env($name, $default = null) {
+    $value = getenv($name);
+    return ($value === false || $value === '') ? $default : $value;
+}
 
-// Configurazione Email — FIX #1: valori SMTP corretti
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'preventivimira1@gmail.com');
-define('SMTP_PASS', 'utss tfvy ecbm bpzh'); // App Password Gmail
+// Configurazione Database
+define('DB_HOST', mira_env('MIRA_DB_HOST', 'localhost'));
+define('DB_NAME', mira_env('MIRA_DB_NAME', 'mira_ecommerce'));
+define('DB_USER', mira_env('MIRA_DB_USER', 'root'));
+define('DB_PASS', mira_env('MIRA_DB_PASS', ''));
+
+// Configurazione Email
+define('SMTP_HOST', mira_env('MIRA_SMTP_HOST', 'smtp.gmail.com'));
+define('SMTP_PORT', (int)mira_env('MIRA_SMTP_PORT', 587));
+define('SMTP_USER', mira_env('MIRA_SMTP_USER', 'preventivimira1@gmail.com'));
+define('SMTP_PASS', mira_env('MIRA_SMTP_PASS', ''));
+define('SMTP_FROM_NAME', mira_env('MIRA_SMTP_FROM_NAME', 'MIRA E-Commerce'));
 
 // Configurazione Generale
 define('SITE_URL', 'http://localhost');
@@ -113,8 +129,19 @@ class Response {
  * FIX #2: verify() ora legge il token anche da $_SERVER per compatibilità Nginx
  */
 class JWT {
-    // FIX: usa una chiave sicura, non il placeholder di default
-    private static $secret = 'mira_JWT_s3cr3t_K3y_2025_CHANGE_ME_IN_PROD!';
+    /**
+     * Il segreto arriva dall'ambiente. Se manca, ogni operazione che firma o
+     * verifica un token si ferma con un errore chiaro: un segreto scritto nel
+     * codice finisce nel repository e chiunque lo legga puo' forgiare token.
+     */
+    private static function secret() {
+        $secret = mira_env('MIRA_JWT_SECRET');
+        if ($secret === null) {
+            error_log('MIRA_JWT_SECRET non impostata: impossibile firmare o verificare i token');
+            Response::error('Configurazione del server incompleta', 500);
+        }
+        return $secret;
+    }
 
     public static function encode($payload) {
         $header  = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
@@ -123,7 +150,7 @@ class JWT {
         $base64UrlHeader  = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
         $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
 
-        $signature          = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::$secret, true);
+        $signature          = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::secret(), true);
         $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
         return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
@@ -137,7 +164,7 @@ class JWT {
 
         list($base64UrlHeader, $base64UrlPayload, $base64UrlSignature) = $parts;
 
-        $signature              = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::$secret, true);
+        $signature              = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::secret(), true);
         $base64UrlSignatureCheck = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
         if (!hash_equals($base64UrlSignature, $base64UrlSignatureCheck)) {

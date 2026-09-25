@@ -11,11 +11,11 @@ require_once 'email_helper.php';
 $db     = Database::getInstance()->getConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 
-$user = JWT::verify();
-
 if ($method !== 'POST') {
     Response::error('Solo richieste POST sono permesse', 405);
 }
+
+$user = JWT::verify();
 
 $data = json_decode(file_get_contents('php://input'), true);
 

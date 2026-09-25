@@ -1,3 +1,31 @@
+// ==================== ESCAPE HTML ====================
+// Il testo cercato e i campi prodotto finiscono dentro innerHTML: senza
+// escape, quello che l'utente scrive nella barra di ricerca viene eseguito
+// come HTML nella pagina dei risultati.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ==================== LETTURA SICURA DA localStorage ====================
+// Un valore corrotto faceva fallire JSON.parse e con lui tutta
+// l'inizializzazione della pagina: ricerca, lingua e account compresi.
+function readStoredJSON(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+    } catch (error) {
+        console.warn(`Valore non leggibile in localStorage: ${key}`, error);
+        localStorage.removeItem(key);
+        return fallback;
+    }
+}
+
 // ==================== CART MANAGEMENT ====================
 // FIX #9: cartObj è mantenuto per retrocompatibilità ma NON gestisce più
 // il carrello in modo autonomo. Il sistema autorevole è cart.js (server-side).
@@ -9,7 +37,7 @@ let cartObj = {
 
 function initCart() {
     // Leggi dal localStorage solo per retrocompatibilità con codice vecchio
-    let cart = JSON.parse(localStorage.getItem('miraCart')) || [];
+    let cart = readStoredJSON('miraCart', []) || [];
 
     function saveCart() {
         localStorage.setItem('miraCart', JSON.stringify(cart));
@@ -35,9 +63,9 @@ function initCart() {
                 div.style.cssText = 'display:flex; gap:10px; margin-bottom:15px; background:#222; padding:10px; border-radius:8px; align-items:flex-start;';
 
                 div.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}" style="width:80px; height:60px; object-fit:cover; border-radius:6px;">
+                    <img src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}" style="width:80px; height:60px; object-fit:cover; border-radius:6px;">
                     <div style="flex:1;">
-                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#fff;">${item.name}</h4>
+                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#fff;">${escapeHtml(item.name)}</h4>
                         <p style="font-size:0.85rem; color:#ccc; margin:3px 0;">€ ${item.price.toFixed(2)}</p>
                         <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
                             <button class="decrease" style="background:#9b59b6; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600;">−</button>
@@ -294,11 +322,17 @@ if (window.location.pathname.includes('risultati.html')) {
 
         if (resultsContainer) {
             const searchQuery   = sessionStorage.getItem('searchQuery') || '';
-            const searchResults = JSON.parse(sessionStorage.getItem('searchResults') || '[]');
+            let searchResults;
+            try {
+                searchResults = JSON.parse(sessionStorage.getItem('searchResults') || '[]');
+            } catch (error) {
+                console.warn('Risultati di ricerca non leggibili', error);
+                searchResults = [];
+            }
 
             if (!searchQuery || searchResults.length === 0) {
                 // Mostra messaggio invece di redirect immediato
-                resultsContainer.innerHTML = `<p style="text-align:center;color:#999;padding:40px;">Nessun risultato trovato per "<strong>${searchQuery}</strong>"</p>`;
+                resultsContainer.innerHTML = `<p style="text-align:center;color:#999;padding:40px;">Nessun risultato trovato per "<strong>${escapeHtml(searchQuery)}</strong>"</p>`;
                 const pageTitle = document.querySelector('.page-title, h1');
                 if (pageTitle) pageTitle.textContent = `Risultati per "${searchQuery}"`;
                 return;
@@ -326,11 +360,11 @@ if (window.location.pathname.includes('risultati.html')) {
                     card.innerHTML = `
                         ${product.is_discount ? '<span class="discount-badge">OFFERTA</span>' : ''}
                         <div class="product-image">
-                            <img src="${product.image_url}" alt="${product.name}">
+                            <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}">
                         </div>
                         <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+                            <h3>${escapeHtml(product.name)}</h3>
+                            <p class="product-desc">${escapeHtml((product.description || '').substring(0, 80))}...</p>
                             <div class="product-rating">
                                 <div class="stars">
                                     ${[1,2,3,4,5].map(s => `<span class="star ${s <= Math.round(avgRating) ? 'filled' : ''}">★</span>`).join('')}

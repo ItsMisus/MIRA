@@ -9,6 +9,21 @@
 const API_BASE = 'http://localhost/mira_ecommerce/api';
 
 // ============================================================================
+// ESCAPE HTML
+// ============================================================================
+// I campi prodotto finiscono dentro innerHTML e dentro attributi value=:
+// senza escape, un apice o del markup rompe la riga della tabella o il form.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================================================
 // STATE MANAGEMENT
 // ============================================================================
 let currentProducts = [];
@@ -35,10 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initProductForm();
     initFilters();
     
-    // Carica dati iniziali
+    // Carica dati iniziali. loadCategories() e loadTags() ricavano i loro
+    // dati da allProducts, quindi le chiama loadProducts() quando i prodotti
+    // sono arrivati: qui girerebbero su una lista ancora vuota.
     loadProducts();
-    loadCategories();
-    loadTags();
 });
 
 // ============================================================================
@@ -57,8 +72,11 @@ function checkAdminAuth() {
     try {
         const userData = JSON.parse(user);
         
-        // Verifica permessi admin
-        if (!userData.is_admin && userData.email !== 'francminu08@gmail.com') {
+        // Il permesso e' solo is_admin: l'indirizzo email scritto nel codice
+        // era un secondo criterio, pubblicato nel repository e comunque
+        // aggirabile (miraUser sta in localStorage). Il controllo che conta
+        // resta quello del backend su ogni scrittura.
+        if (!userData.is_admin) {
             alert('⚠️ Non hai i permessi necessari per accedere al pannello admin');
             window.location.href = '../index.html';
             return;
@@ -151,20 +169,43 @@ async function loadProducts() {
         
         // Chiamata diretta con fetch per avere più controllo
         const token = localStorage.getItem('miraToken');
-        const response = await fetch(`${API_BASE}/products.php?limit=1000`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token && { 'Authorization': `Bearer ${token}` })
-            }
-        });
+        const headers = {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        };
         
-        console.log('📡 Response status:', response.status);
+        // Il backend serve al massimo 100 prodotti per richiesta: chiedere
+        // limit=1000 ne riportava comunque 100 e il resto spariva dal
+        // pannello. include_inactive serve a rivedere anche i disattivati,
+        // altrimenti il filtro "Inattivo" non poteva restituire nulla.
+        const perPage = 100;
+        let page = 1;
+        let totalPages = 1;
+        const collected = [];
+        let lastData = null;
         
-        const data = await response.json();
+        do {
+            const response = await fetch(
+                `${API_BASE}/products.php?limit=${perPage}&page=${page}&include_inactive=true`,
+                { headers }
+            );
+            
+            console.log('📡 Response status:', response.status);
+            
+            lastData = await response.json();
+            
+            if (!lastData.success || !lastData.data || !lastData.data.products) break;
+            
+            collected.push(...lastData.data.products);
+            totalPages = (lastData.data.pagination && lastData.data.pagination.pages) || 1;
+            page++;
+        } while (page <= totalPages);
+        
+        const data = lastData;
         console.log('📦 Response data:', data);
         
-        if (data.success && data.data && data.data.products) {
-            allProducts = data.data.products;
+        if (data && data.success && data.data && data.data.products) {
+            allProducts = collected;
             console.log('✅ Prodotti caricati:', allProducts.length);
             
             // Carica anche categorie e tags dopo aver caricato i prodotti
@@ -350,11 +391,11 @@ function renderProducts() {
             </td>
             <td>
                 <div class="product-image-cell">
-                    <img src="${product.image_url}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2212%22 fill=%22%239ca3af%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+                    <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2212%22 fill=%22%239ca3af%22%3ENo Image%3C/text%3E%3C/svg%3E'">
                 </div>
             </td>
-            <td><strong>${product.name}</strong></td>
-            <td>${product.category_name || '-'}</td>
+            <td><strong>${escapeHtml(product.name)}</strong></td>
+            <td>${escapeHtml(product.category_name || '-')}</td>
             <td>${priceDisplay}</td>
             <td>
                 <span class="badge ${product.stock > 10 ? 'badge-success' : 'badge-warning'}">
@@ -582,6 +623,20 @@ function initProductForm() {
             return;
         }
         
+        // Sconto spuntato senza prezzo scontato: il prodotto finiva in
+        // vetrina e in carrello a 0,00 EUR.
+        if (formData.is_discount && !formData.discount_price) {
+            showToast('⚠️ Indica il prezzo scontato, oppure togli la spunta sullo sconto', 'error');
+            return;
+        }
+        
+        if (formData.discount_price !== null && formData.discount_price >= formData.price) {
+            showToast('⚠️ Il prezzo scontato deve essere inferiore al prezzo pieno', 'error');
+            return;
+        }
+        
+        if (Number.isNaN(formData.stock)) formData.stock = 0;
+        
         if (editingProductId) {
             await updateProduct(editingProductId, formData);
         } else {
@@ -610,6 +665,15 @@ function openProductModal(productId = null) {
         const product = allProducts.find(p => p.id === productId);
         if (product) {
             populateProductForm(product);
+        } else {
+            // Senza reset il form restava pieno dei dati del prodotto aperto
+            // prima, ma editingProductId puntava gia' a questo: il salvataggio
+            // avrebbe sovrascritto un prodotto con i valori di un altro.
+            form.reset();
+            clearSpecifications();
+            editingProductId = null;
+            showToast('Prodotto non trovato, ricarica la lista', 'error');
+            return;
         }
     } else {
         // Create mode
@@ -654,8 +718,8 @@ function addSpecificationRow(key = '', value = '') {
     const row = document.createElement('div');
     row.className = 'spec-row';
     row.innerHTML = `
-        <input type="text" class="spec-key" placeholder="Nome (es: CPU)" value="${key}">
-        <input type="text" class="spec-value" placeholder="Valore (es: Intel i7)" value="${value}">
+        <input type="text" class="spec-key" placeholder="Nome (es: CPU)" value="${escapeHtml(key)}">
+        <input type="text" class="spec-value" placeholder="Valore (es: Intel i7)" value="${escapeHtml(value)}">
         <button type="button" class="btn-remove-spec" onclick="this.parentElement.remove()">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
@@ -690,7 +754,7 @@ function populateCategorySelects() {
     
     select.innerHTML = '<option value="">-- Seleziona Categoria --</option>';
     currentCategories.forEach(cat => {
-        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+        select.innerHTML += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`;
     });
 }
 
@@ -700,7 +764,7 @@ function populateCategoryFilter() {
     
     select.innerHTML = '<option value="">Tutte le categorie</option>';
     currentCategories.forEach(cat => {
-        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+        select.innerHTML += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`;
     });
 }
 

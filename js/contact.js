@@ -33,8 +33,19 @@ function initContactForm() {
     
     console.log('Utente autenticato, pre-compilo il form');
     
-    // Pre-compila il form con i dati utente
-    const userData = JSON.parse(user);
+    // Pre-compila il form con i dati utente. Un miraUser corrotto faceva
+    // fallire JSON.parse e con lui anche initFAQ, che gira dopo.
+    let userData = null;
+    try {
+        userData = JSON.parse(user);
+    } catch (error) {
+        console.warn('Dati utente non leggibili', error);
+        localStorage.removeItem('miraUser');
+        localStorage.removeItem('miraToken');
+        showAuthRequired();
+        return;
+    }
+    
     if (userData) {
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
@@ -151,7 +162,7 @@ function showAlert(message, type) {
     
     formAlert.innerHTML = `
         <div class="alert ${alertClass} show">
-            ${message}
+            ${escapeAlertText(message)}
         </div>
     `;
     
@@ -163,6 +174,14 @@ function showAlert(message, type) {
             formAlert.innerHTML = '';
         }, 5000);
     }
+}
+
+function escapeAlertText(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 // FAQ Accordion

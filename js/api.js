@@ -22,10 +22,18 @@ class MiraAPI {
 
         try {
             const response = await fetch(url, { ...options, headers });
-            const data     = await response.json();
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                throw new Error(`Risposta non valida dal server (HTTP ${response.status})`);
+            }
 
             if (!response.ok) {
-                throw new Error(data.message || 'Errore nella richiesta');
+                const error = new Error(data.message || 'Errore nella richiesta');
+                error.status = response.status;
+                throw error;
             }
 
             return data;
@@ -148,8 +156,16 @@ class MiraAPI {
     isAuthenticated() { return !!this.token; }
 
     getCurrentUser() {
-        const user = localStorage.getItem('miraUser');
-        return user ? JSON.parse(user) : null;
+        // Un miraUser corrotto faceva fallire JSON.parse qui dentro, e
+        // l'eccezione fermava l'inizializzazione di ogni pagina che lo legge.
+        try {
+            const user = localStorage.getItem('miraUser');
+            return user ? JSON.parse(user) : null;
+        } catch (error) {
+            console.warn('Dati utente non leggibili, sessione azzerata', error);
+            this.logout();
+            return null;
+        }
     }
 
     // ==================== CONTACT ====================
@@ -160,6 +176,19 @@ class MiraAPI {
             body: JSON.stringify(data)
         });
     }
+}
+
+// ==================== ESCAPE HTML ====================
+// I dati prodotto finiscono dentro innerHTML: senza escape, un nome o una
+// descrizione che contiene markup viene eseguito come HTML dalla pagina.
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 // ==================== EXPORT ====================
@@ -180,11 +209,11 @@ function createProductCard(product) {
     card.innerHTML = `
         ${hasDiscount ? '<span class="discount-badge">OFFERTA</span>' : ''}
         <div class="product-image">
-            <img src="${product.image_url}" alt="${product.name}" loading="lazy">
+            <img src="${escapeHtml(product.image_url)}" alt="${escapeHtml(product.name)}" loading="lazy">
         </div>
         <div class="product-info">
-            <h3>${product.name}</h3>
-            <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+            <h3>${escapeHtml(product.name)}</h3>
+            <p class="product-desc">${escapeHtml((product.description || '').substring(0, 80))}...</p>
             <div class="product-rating">
                 <div class="stars">
                     ${[1,2,3,4,5].map(s =>
@@ -319,21 +348,6 @@ function interceptCartOperations() {
         }
     };
 }
-
-// ==================== CART HELPER FUNCTIONS ====================
-
-window.updateCartQuantity = async (itemId, quantity) => {
-    try {
-        if (window.cartObj && window.cartObj.cart) {
-            const item = window.cartObj.cart.find(i => i.id === itemId);
-            if (item) { item.qty = quantity; window.cartObj.saveCart(); window.cartObj.updateCart(); }
-        }
-        const token = localStorage.getItem('miraToken');
-        if (token) await api.updateCartItem(itemId, quantity);
-    } catch (error) {
-        console.error('Error updating cart:', error);
-    }
-};
 
 // ==================== MODULE EXPORT ====================
 if (typeof module !== 'undefined' && module.exports) {

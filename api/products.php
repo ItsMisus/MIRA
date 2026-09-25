@@ -55,8 +55,18 @@ function getProducts($db, $params) {
     $limit  = isset($params['limit']) ? min(100, max(1, (int)$params['limit'])) : 100;
     $offset = ($page - 1) * $limit;
 
-    $where    = ['p.is_active = 1'];
+    $where    = [];
     $bindings = [];
+
+    // Solo un admin puo' chiedere anche i prodotti disattivati. Senza questo
+    // il pannello non rivedeva mai un prodotto appena eliminato, e il suo
+    // filtro "Inattivo" non poteva restituire nulla.
+    if (isset($params['include_inactive']) && $params['include_inactive'] === 'true') {
+        $user = JWT::verify();
+        if (empty($user['is_admin'])) Response::error('Accesso non autorizzato', 403);
+    } else {
+        $where[] = 'p.is_active = 1';
+    }
 
     if (isset($params['category'])) {
         $where[]               = 'c.slug = :category';
@@ -91,7 +101,7 @@ function getProducts($db, $params) {
         $where[] = 'p.is_featured = 1';
     }
 
-    $whereClause = implode(' AND ', $where);
+    $whereClause = $where ? implode(' AND ', $where) : '1 = 1';
 
     $orderBy = 'p.created_at DESC';
     if (isset($params['sort'])) {
@@ -144,6 +154,11 @@ function getProducts($db, $params) {
         $product['avg_rating']   = round((float)$product['avg_rating'], 1);
         $product['review_count'] = (int)$product['review_count'];
 
+        // Sconto dichiarato ma senza prezzo scontato: il flag non e' usabile.
+        if ($product['discount_price'] === null) {
+            $product['is_discount'] = 0;
+        }
+
         $specsStmt = $db->prepare("SELECT spec_key, spec_value FROM product_specs WHERE product_id = ? ORDER BY display_order");
         $specsStmt->execute([$product['id']]);
         $specs = $specsStmt->fetchAll();
@@ -195,6 +210,11 @@ function getProduct($db, $id) {
     $product['tags']         = $product['tags'] ? explode(',', $product['tags']) : [];
     $product['avg_rating']   = round((float)$product['avg_rating'], 1);
     $product['review_count'] = (int)$product['review_count'];
+
+    // Sconto dichiarato ma senza prezzo scontato: il flag non e' usabile.
+    if ($product['discount_price'] === null) {
+        $product['is_discount'] = 0;
+    }
 
     $specsStmt = $db->prepare("SELECT spec_key, spec_value FROM product_specs WHERE product_id = ? ORDER BY display_order");
     $specsStmt->execute([$product['id']]);
@@ -284,7 +304,7 @@ function createProduct($db, $data) {
         Response::success(['id' => $productId], 'Prodotto creato con successo', 201);
 
     } catch (Exception $e) {
-        $db->rollBack();
+        if ($db->inTransaction()) $db->rollBack();
         error_log($e->getMessage());
         Response::error('Errore durante la creazione del prodotto', 500);
     }
@@ -312,6 +332,16 @@ function updateProduct($db, $id, $data) {
             Response::error('Nessun campo da aggiornare');
         }
 
+        // discount_price svuotato => lo sconto si spegne con lui.
+        if (array_key_exists(':discount_price', $params)
+            && ($params[':discount_price'] === null || $params[':discount_price'] === '')) {
+            $params[':discount_price'] = null;
+            if (!in_array('is_discount = :is_discount', $fields, true)) {
+                $fields[] = 'is_discount = :is_discount';
+            }
+            $params[':is_discount'] = 0;
+        }
+
         $sql  = "UPDATE products SET " . implode(', ', $fields) . " WHERE id = :id";
         $stmt = $db->prepare($sql);
         $stmt->execute($params);
@@ -337,7 +367,7 @@ function updateProduct($db, $id, $data) {
         Response::success(null, 'Prodotto aggiornato con successo');
 
     } catch (Exception $e) {
-        $db->rollBack();
+        if ($db->inTransaction()) $db->rollBack();
         error_log($e->getMessage());
         Response::error('Errore durante l\'aggiornamento del prodotto', 500);
     }
@@ -347,12 +377,13 @@ function updateProduct($db, $id, $data) {
  * Delete product (soft delete)
  */
 function deleteProduct($db, $id) {
-    $stmt = $db->prepare("UPDATE products SET is_active = 0 WHERE id = ?");
-    $stmt->execute([$id]);
-
-    if ($stmt->rowCount() === 0) {
+    $checkStmt = $db->prepare("SELECT id FROM products WHERE id = ?");
+    $checkStmt->execute([$id]);
+    if (!$checkStmt->fetch()) {
         Response::error('Prodotto non trovato', 404);
     }
+
+    $db->prepare("UPDATE products SET is_active = 0 WHERE id = ?")->execute([$id]);
 
     Response::success(null, 'Prodotto eliminato con successo');
 }
@@ -381,6 +412,10 @@ function createSlug($name, $db) {
     $name = strtr($name, $accents);
     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name), '-'));
     $slug = preg_replace('/-+/', '-', $slug); // rimuovi trattini multipli
+
+    if ($slug === '') {
+        $slug = 'prodotto';
+    }
 
     // Assicura unicità
     $base  = $slug;
