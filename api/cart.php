@@ -20,12 +20,12 @@ switch ($method) {
         break;
 
     case 'POST':
-        addToCart($db, $userId, json_decode(file_get_contents('php://input'), true));
+        addToCart($db, $userId, readJsonBody());
         break;
 
     case 'PUT':
         if (!isset($_GET['id'])) Response::error('ID item mancante', 400);
-        updateCartItem($db, $userId, $_GET['id'], json_decode(file_get_contents('php://input'), true));
+        updateCartItem($db, $userId, (int)$_GET['id'], readJsonBody());
         break;
 
     case 'DELETE':
@@ -33,7 +33,7 @@ switch ($method) {
             clearCart($db, $userId);
         } else {
             if (!isset($_GET['id'])) Response::error('ID item mancante', 400);
-            removeFromCart($db, $userId, $_GET['id']);
+            removeFromCart($db, $userId, (int)$_GET['id']);
         }
         break;
 
@@ -291,4 +291,3 @@ function clearCart($db, $userId) {
         Response::error('Errore durante lo svuotamento del carrello', 500);
     }
 }
-?>

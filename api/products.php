@@ -23,24 +23,22 @@ switch ($method) {
         }
         break;
 
+    // Scritture: il ruolo admin si legge dal database, non dal token (vedi requireAdmin).
     case 'POST':
-        $user = JWT::verify();
-        if (empty($user['is_admin'])) Response::error('Accesso non autorizzato', 403);
-        createProduct($db, json_decode(file_get_contents('php://input'), true));
+        requireAdmin($db);
+        createProduct($db, readJsonBody());
         break;
 
     case 'PUT':
-        $user = JWT::verify();
-        if (empty($user['is_admin'])) Response::error('Accesso non autorizzato', 403);
+        requireAdmin($db);
         if (!isset($_GET['id'])) Response::error('ID prodotto mancante');
-        updateProduct($db, $_GET['id'], json_decode(file_get_contents('php://input'), true));
+        updateProduct($db, (int)$_GET['id'], readJsonBody());
         break;
 
     case 'DELETE':
-        $user = JWT::verify();
-        if (empty($user['is_admin'])) Response::error('Accesso non autorizzato', 403);
+        requireAdmin($db);
         if (!isset($_GET['id'])) Response::error('ID prodotto mancante');
-        deleteProduct($db, $_GET['id']);
+        deleteProduct($db, (int)$_GET['id']);
         break;
 
     default:
@@ -68,17 +66,22 @@ function getProducts($db, $params) {
         $bindings[':tag'] = $params['tag'];
     }
 
-    if (isset($params['search'])) {
-        $where[]           = '(p.name LIKE :search OR p.description LIKE :search)';
-        $bindings[':search'] = '%' . $params['search'] . '%';
+    if (isset($params['search']) && trim((string)$params['search']) !== '') {
+        // Due segnaposto distinti: con i prepared statement nativi (EMULATE_PREPARES
+        // false) MySQL rifiuta lo stesso nome usato due volte (SQLSTATE HY093).
+        // % e _ scritti dall'utente sono testo, non jolly.
+        $term = '%' . addcslashes(trim((string)$params['search']), '%_\\') . '%';
+        $where[] = '(p.name LIKE :search_name OR p.description LIKE :search_desc)';
+        $bindings[':search_name'] = $term;
+        $bindings[':search_desc'] = $term;
     }
 
-    if (isset($params['min_price'])) {
+    if (isset($params['min_price']) && is_numeric($params['min_price'])) {
         $where[]              = 'p.price >= :min_price';
         $bindings[':min_price'] = $params['min_price'];
     }
 
-    if (isset($params['max_price'])) {
+    if (isset($params['max_price']) && is_numeric($params['max_price'])) {
         $where[]              = 'p.price <= :max_price';
         $bindings[':max_price'] = $params['max_price'];
     }
@@ -139,20 +142,27 @@ function getProducts($db, $params) {
     $stmt->execute();
     $products = $stmt->fetchAll();
 
+    // Le specifiche di tutti i prodotti della pagina con una query sola, non una
+    // per prodotto: con limit=100 erano 101 query a ogni caricamento.
+    $specsByProduct = [];
+    $ids = array_column($products, 'id');
+    if ($ids) {
+        $in        = implode(',', array_fill(0, count($ids), '?'));
+        $specsStmt = $db->prepare("SELECT product_id, spec_key, spec_value FROM product_specs
+                                   WHERE product_id IN ($in) ORDER BY product_id, display_order");
+        $specsStmt->execute($ids);
+        foreach ($specsStmt->fetchAll() as $spec) {
+            $specsByProduct[$spec['product_id']][$spec['spec_key']] = $spec['spec_value'];
+        }
+    }
+
     foreach ($products as &$product) {
         $product['tags']         = $product['tags'] ? explode(',', $product['tags']) : [];
         $product['avg_rating']   = round((float)$product['avg_rating'], 1);
         $product['review_count'] = (int)$product['review_count'];
-
-        $specsStmt = $db->prepare("SELECT spec_key, spec_value FROM product_specs WHERE product_id = ? ORDER BY display_order");
-        $specsStmt->execute([$product['id']]);
-        $specs = $specsStmt->fetchAll();
-
-        $product['specs'] = [];
-        foreach ($specs as $spec) {
-            $product['specs'][$spec['spec_key']] = $spec['spec_value'];
-        }
+        $product['specs']        = $specsByProduct[$product['id']] ?? [];
     }
+    unset($product);
 
     Response::success([
         'products'   => $products,
@@ -230,6 +240,10 @@ function getProductBySlug($db, $slug) {
  */
 function createProduct($db, $data) {
     $errors = [];
+    if ($error = Validator::maxLength($data['name'] ?? '', 200, 'Nome'))    $errors[] = $error;
+    if (!empty($data['image_url']) && !preg_match('#^(https?://|/|[a-z0-9_./-]+$)#i', $data['image_url'])) {
+        $errors[] = 'URL immagine non valido';
+    }
     if ($error = Validator::required($data['name'] ?? '', 'Nome'))         $errors[] = $error;
     if ($error = Validator::required($data['description'] ?? '', 'Descrizione')) $errors[] = $error;
     if ($error = Validator::numeric($data['price'] ?? '', 'Prezzo'))       $errors[] = $error;
@@ -284,7 +298,7 @@ function createProduct($db, $data) {
         Response::success(['id' => $productId], 'Prodotto creato con successo', 201);
 
     } catch (Exception $e) {
-        $db->rollBack();
+        if ($db->inTransaction()) $db->rollBack();
         error_log($e->getMessage());
         Response::error('Errore durante la creazione del prodotto', 500);
     }
@@ -301,6 +315,10 @@ function updateProduct($db, $id, $data) {
         $params = [':id' => $id];
         $allowedFields = ['name', 'description', 'price', 'discount_price', 'is_discount', 'image_url', 'category_id', 'stock', 'is_featured', 'is_active'];
 
+        if (isset($data['image_url']) && !preg_match('#^(https?://|/|[a-z0-9_./-]+$)#i', (string)$data['image_url'])) {
+            Response::error('URL immagine non valido', 400);
+        }
+
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $data)) {
                 $fields[]        = "$field = :$field";
@@ -309,6 +327,7 @@ function updateProduct($db, $id, $data) {
         }
 
         if (empty($fields)) {
+            $db->rollBack();
             Response::error('Nessun campo da aggiornare');
         }
 
@@ -337,7 +356,7 @@ function updateProduct($db, $id, $data) {
         Response::success(null, 'Prodotto aggiornato con successo');
 
     } catch (Exception $e) {
-        $db->rollBack();
+        if ($db->inTransaction()) $db->rollBack();
         error_log($e->getMessage());
         Response::error('Errore durante l\'aggiornamento del prodotto', 500);
     }
@@ -399,5 +418,3 @@ function createSlug($name, $db) {
 
     return $slug;
 }
-// Fine del file products.php
-?>

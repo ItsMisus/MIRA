@@ -1,3 +1,6 @@
+-- Schema del database MIRA, SENZA dati personali.
+-- Contiene solo struttura, categorie e tag. Nessun utente: l'amministratore
+-- si crea con `php tools/create-admin.php <email>` dopo l'importazione.
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
@@ -52,13 +55,6 @@ CREATE TABLE `carts` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dump dei dati per la tabella `carts`
---
-
-INSERT INTO `carts` (`id`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, 2, '2025-12-14 16:44:37', '2025-12-14 16:44:37');
 
 -- --------------------------------------------------------
 
@@ -178,40 +174,6 @@ CREATE TABLE `products` (
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `products_backup`
---
-
-CREATE TABLE `products_backup` (
-  `id` int(11) NOT NULL DEFAULT 0,
-  `name` varchar(255) NOT NULL,
-  `slug` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `price` decimal(10,2) NOT NULL,
-  `discount_price` decimal(10,2) DEFAULT NULL,
-  `is_discount` tinyint(1) DEFAULT 0,
-  `image_url` text NOT NULL,
-  `category_id` int(11) DEFAULT NULL,
-  `stock` int(11) DEFAULT 0,
-  `is_featured` tinyint(1) DEFAULT 0,
-  `is_active` tinyint(1) DEFAULT 1,
-  `views` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dump dei dati per la tabella `products_backup`
---
-
-INSERT INTO `products_backup` (`id`, `name`, `slug`, `description`, `price`, `discount_price`, `is_discount`, `image_url`, `category_id`, `stock`, `is_featured`, `is_active`, `views`, `created_at`, `updated_at`) VALUES
-(1, 'ORION Gaming PC', 'orion-gaming-pc', 'Potenza estrema con componenti di ultima generazione', 1499.99, 1299.99, 1, 'https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=800', 1, 15, 1, 1, 0, '2025-12-12 19:07:15', '2025-12-12 19:07:15'),
-(2, 'NOVA Workstation', 'nova-workstation', 'Potenza AMD di ultima generazione con GPU migliorata', 2999.99, 2699.99, 1, 'https://images.unsplash.com/photo-1591488320449-011701bb6704?w=800', 1, 10, 1, 1, 0, '2025-12-12 19:07:15', '2025-12-12 19:07:15'),
-(3, 'QUANTUM White', 'quantum-white', 'Design elegante tutto bianco con prestazioni premium', 2299.99, NULL, 0, 'https://images.unsplash.com/photo-1593640495253-23196b27a87f?w=800', 1, 8, 1, 1, 0, '2025-12-12 19:07:15', '2025-12-12 19:07:15'),
-(4, 'NEBULA Console Killer', 'nebula-console-killer', 'Prestazioni superiori a qualsiasi console sul mercato', 1299.99, 1099.99, 1, 'https://images.unsplash.com/photo-1624705002806-5d72df19c3ad?w=800', 1, 20, 1, 1, 0, '2025-12-12 19:07:15', '2025-12-12 19:07:15');
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `product_specs`
 --
 
@@ -247,7 +209,7 @@ CREATE TABLE `reviews` (
   `reviewer_name` varchar(100) NOT NULL,
   `rating` int(11) NOT NULL CHECK (`rating` between 1 and 5),
   `comment` text NOT NULL,
-  `is_approved` tinyint(1) DEFAULT 1,
+  `is_approved` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -291,17 +253,10 @@ CREATE TABLE `users` (
   `last_name` varchar(100) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `is_admin` tinyint(1) DEFAULT 0,
+  `token_version` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dump dei dati per la tabella `users`
---
-
-INSERT INTO `users` (`id`, `email`, `password`, `first_name`, `last_name`, `phone`, `is_admin`, `created_at`, `updated_at`) VALUES
-(1, 'admin@mira.com', 'Gambol_123_456', 'Admin', 'MIRA', NULL, 1, '2025-12-12 19:07:15', '2025-12-14 16:46:59'),
-(2, 'francesco.minutiello08@gmail.com', '$2y$10$PuXRXnHDZOKpS8YnBTmij.5P1S0JyxWaWHvoPGH0MBJPQDNolUzTy', 'Francesco', 'Minutiello', '3775900298', 0, '2025-12-14 16:44:36', '2025-12-14 16:44:36');
 
 --
 -- Indici per le tabelle scaricate
@@ -549,6 +504,17 @@ ALTER TABLE `product_tags`
 ALTER TABLE `reviews`
   ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Freno ai tentativi (login, registrazione, contatti, recensioni)
+--
+
+CREATE TABLE `rate_limits` (
+  `bucket` varchar(150) NOT NULL,
+  `hit_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  KEY `bucket_hit` (`bucket`,`hit_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -1,0 +1,13 @@
+# Solo gli endpoint sono raggiungibili: configurazione, segreti, helper e
+# libreria email si includono da PHP ma non si chiamano dal browser.
+<FilesMatch "^(config|secrets|secrets\.example|email_helper)\.php$">
+    Require all denied
+</FilesMatch>
+RedirectMatch 404 /api/phpmailer(/|$)
+
+# Su Apache con PHP in CGI/FastCGI l'header Authorization va passato a mano.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>

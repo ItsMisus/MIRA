@@ -1,0 +1,12 @@
+# Segreti: modello in api/secrets.example.php
+api/secrets.php
+
+# Dump completi del database: contengono utenti e dati personali
+private/
+*.sql
+!database/**/*.sql
+
+.env
+*.log
+.DS_Store
+Thumbs.db

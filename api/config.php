@@ -5,32 +5,65 @@
  * FIX #1: SMTP corretto | FIX #2: JWT verify compatibile Nginx
  */
 
-// Configurazione Database
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'mira_ecommerce');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Gli errori non devono mai finire nella risposta: percorsi e query restano nei log.
+ini_set('display_errors', '0');
 
-// Configurazione Email — FIX #1: valori SMTP corretti
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587);
-define('SMTP_USER', 'preventivimira1@gmail.com');
-define('SMTP_PASS', 'utss tfvy ecbm bpzh'); // App Password Gmail
+// Segreti fuori dal codice: api/secrets.php non e' su git (modello: secrets.example.php).
+$secretsFile = __DIR__ . '/secrets.php';
+if (!is_file($secretsFile)) {
+    http_response_code(500);
+    header('Content-Type: application/json; charset=UTF-8');
+    error_log('MIRA: manca api/secrets.php (copia api/secrets.example.php)');
+    echo json_encode(['success' => false, 'message' => 'Configurazione del server incompleta']);
+    exit;
+}
+$secrets = require $secretsFile;
+
+// Configurazione Database
+define('DB_HOST', $secrets['db_host']);
+define('DB_NAME', $secrets['db_name']);
+define('DB_USER', $secrets['db_user']);
+define('DB_PASS', $secrets['db_pass']);
+
+// Configurazione Email
+define('SMTP_HOST', $secrets['smtp_host']);
+define('SMTP_PORT', (int)$secrets['smtp_port']);
+define('SMTP_USER', $secrets['smtp_user']);
+define('SMTP_PASS', $secrets['smtp_pass']);
 
 // Configurazione Generale
-define('SITE_URL', 'http://localhost');
-define('API_URL', SITE_URL . '/mira_ecommerce/api');
-define('UPLOAD_DIR', __DIR__ . '/uploads/');
-define('MAX_UPLOAD_SIZE', 5 * 1024 * 1024); // 5MB
+define('SITE_URL', rtrim($secrets['site_url'], '/'));
+define('JWT_SECRET', $secrets['jwt_secret']);
+
+// Durata dei token di accesso.
+define('TOKEN_TTL', 7 * 86400);
 
 // Timezone
 date_default_timezone_set('Europe/Rome');
 
-// CORS Headers
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+// CORS: solo i domini del sito, non qualsiasi pagina web.
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if ($origin !== '' && in_array($origin, $secrets['allowed_origins'] ?? [], true)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header('Vary: Origin');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
+}
+unset($secrets, $secretsFile, $origin);
+
 header('Content-Type: application/json; charset=UTF-8');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('Cache-Control: no-store');
+
+// Qualsiasi errore non gestito diventa una risposta JSON, non una pagina HTML.
+set_exception_handler(function (Throwable $e) {
+    error_log('MIRA: ' . $e);
+    if (!headers_sent()) {
+        http_response_code(500);
+    }
+    echo json_encode(['success' => false, 'message' => 'Errore interno del server', 'errors' => []]);
+});
 
 // Gestisci preflight OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -113,8 +146,14 @@ class Response {
  * FIX #2: verify() ora legge il token anche da $_SERVER per compatibilità Nginx
  */
 class JWT {
-    // FIX: usa una chiave sicura, non il placeholder di default
-    private static $secret = 'mira_JWT_s3cr3t_K3y_2025_CHANGE_ME_IN_PROD!';
+    /** La chiave arriva da api/secrets.php: senza una chiave robusta non si firma niente. */
+    private static function secret() {
+        if (!defined('JWT_SECRET') || strlen(JWT_SECRET) < 32) {
+            error_log('MIRA: jwt_secret mancante o piu\' corto di 32 caratteri');
+            Response::error('Configurazione del server incompleta', 500);
+        }
+        return JWT_SECRET;
+    }
 
     public static function encode($payload) {
         $header  = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
@@ -123,7 +162,7 @@ class JWT {
         $base64UrlHeader  = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
         $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($payload));
 
-        $signature          = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::$secret, true);
+        $signature          = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::secret(), true);
         $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
         return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
@@ -137,7 +176,7 @@ class JWT {
 
         list($base64UrlHeader, $base64UrlPayload, $base64UrlSignature) = $parts;
 
-        $signature              = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::$secret, true);
+        $signature              = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, self::secret(), true);
         $base64UrlSignatureCheck = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
 
         if (!hash_equals($base64UrlSignature, $base64UrlSignatureCheck)) {
@@ -147,8 +186,8 @@ class JWT {
         $payload = base64_decode(str_replace(['-', '_'], ['+', '/'], $base64UrlPayload));
         $decoded = json_decode($payload, true);
 
-        // Verifica scadenza token
-        if (isset($decoded['exp']) && $decoded['exp'] < time()) {
+        // Un token senza scadenza o senza utente non vale: non scadrebbe mai.
+        if (!is_array($decoded) || !isset($decoded['exp'], $decoded['id']) || $decoded['exp'] < time()) {
             return null;
         }
 
@@ -193,8 +232,64 @@ class JWT {
             Response::error('Token non valido o scaduto', 401);
         }
 
+        // Logout e cambio password incrementano token_version: i token emessi
+        // prima smettono di valere subito, invece che alla scadenza.
+        $stmt = Database::getInstance()->getConnection()
+            ->prepare('SELECT token_version FROM users WHERE id = ?');
+        $stmt->execute([$payload['id']]);
+        $row = $stmt->fetch();
+        if (!$row || (int)$row['token_version'] !== (int)($payload['ver'] ?? -1)) {
+            Response::error('Sessione non più valida, rifai il login', 401);
+        }
+
         return $payload;
     }
+}
+
+/**
+ * Corpo JSON della richiesta, sempre come array: un JSON rotto non deve
+ * arrivare alle funzioni come null.
+ */
+function readJsonBody() {
+    $data = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($data)) {
+        Response::error('Dati JSON non validi', 400);
+    }
+    return $data;
+}
+
+/**
+ * Token valido E utente admin adesso, nel database. Il flag is_admin dentro
+ * il token non basta: chi toglie il ruolo a un utente deve vederlo subito.
+ */
+function requireAdmin($db) {
+    $payload = JWT::verify();
+    $stmt = $db->prepare('SELECT is_admin FROM users WHERE id = ?');
+    $stmt->execute([$payload['id']]);
+    $row = $stmt->fetch();
+    if (!$row || (int)$row['is_admin'] !== 1) {
+        Response::error('Accesso non autorizzato', 403);
+    }
+    return $payload;
+}
+
+/**
+ * Freno ai tentativi: al massimo $max richieste per $bucket ogni $seconds.
+ * Serve la tabella rate_limits (database/migrations/001_sicurezza.sql).
+ */
+function rateLimit($db, $bucket, $max, $seconds) {
+    $db->prepare('DELETE FROM rate_limits WHERE hit_at < (NOW() - INTERVAL ? SECOND)')
+       ->execute([(int)$seconds]);
+    $count = $db->prepare('SELECT COUNT(*) FROM rate_limits WHERE bucket = ?');
+    $count->execute([$bucket]);
+    if ((int)$count->fetchColumn() >= $max) {
+        Response::error('Troppi tentativi, riprova più tardi', 429);
+    }
+    $db->prepare('INSERT INTO rate_limits (bucket) VALUES (?)')->execute([$bucket]);
+}
+
+function clientIp() {
+    return $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 }
 
 /**
@@ -202,7 +297,10 @@ class JWT {
  */
 class Validator {
     public static function required($value, $fieldName) {
-        if (empty($value) && $value !== '0') {
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+        if ($value === '' || $value === null || $value === []) {
             return "$fieldName è obbligatorio";
         }
         return null;
@@ -236,5 +334,3 @@ class Validator {
         return null;
     }
 }
-// Fine del file config.php
-?>

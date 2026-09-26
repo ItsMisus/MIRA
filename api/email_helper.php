@@ -10,16 +10,31 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
-require_once __DIR__ . '/../vendor/autoload.php';
+// PHPMailer 7.0.1 e' nel repository in api/phpmailer: niente Composer sul
+// server. Prima si caricava da vendor/, che era vuota, e ogni invio finiva in
+// "Class not found".
+require_once __DIR__ . '/phpmailer/Exception.php';
+require_once __DIR__ . '/phpmailer/PHPMailer.php';
+require_once __DIR__ . '/phpmailer/SMTP.php';
 
 class EmailHelper {
 
-    private static $smtp_host   = 'smtp.gmail.com';
-    private static $smtp_port   = 587;
-    private static $smtp_user   = 'preventivimira1@gmail.com';
-    private static $smtp_pass   = 'utss tfvy ecbm bpzh';
-    private static $from_email  = 'preventivimira1@gmail.com';
+    // Credenziali da api/secrets.php, tramite le costanti di config.php.
     private static $from_name   = 'MIRA E-Commerce';
+
+    /** Testo sicuro dentro l'HTML di un'email. */
+    private static function h($value) {
+        return htmlspecialchars((string)$value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    /** Copia dei dati del form con i campi gia' pronti per l'HTML (il messaggio a parte). */
+    private static function escaped($data) {
+        $out = [];
+        foreach ($data as $key => $value) {
+            $out[$key] = $key === 'message' ? $value : self::h($value);
+        }
+        return $out;
+    }
 
     /**
      * Configurazione base PHPMailer
@@ -29,12 +44,12 @@ class EmailHelper {
         $mail = new PHPMailer(true);
 
         $mail->isSMTP();
-        $mail->Host        = self::$smtp_host;
+        $mail->Host        = SMTP_HOST;
         $mail->SMTPAuth    = true;
-        $mail->Username    = self::$smtp_user;
-        $mail->Password    = self::$smtp_pass;
+        $mail->Username    = SMTP_USER;
+        $mail->Password    = SMTP_PASS;
         $mail->SMTPSecure  = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port        = self::$smtp_port;
+        $mail->Port        = SMTP_PORT;
         $mail->CharSet     = 'UTF-8';
         $mail->Timeout     = 30;
         $mail->SMTPKeepAlive = false;
@@ -50,7 +65,7 @@ class EmailHelper {
         $mail = null;
         try {
             $mail = self::getMailer();
-            $mail->setFrom(self::$from_email, self::$from_name);
+            $mail->setFrom(SMTP_USER, self::$from_name);
             $mail->addAddress($userEmail, $userName);
             $mail->isHTML(true);
             $mail->Subject = 'Benvenuto in MIRA - Account Attivato';
@@ -64,7 +79,7 @@ class EmailHelper {
             }
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             error_log("❌ Welcome email error: " . $e->getMessage());
             // FIX #7: accede a ErrorInfo solo se $mail è un'istanza valida
             if ($mail instanceof PHPMailer) {
@@ -81,9 +96,9 @@ class EmailHelper {
         $mail = null;
         try {
             $mail = self::getMailer();
-            $mail->setFrom(self::$from_email, self::$from_name);
+            $mail->setFrom(SMTP_USER, self::$from_name);
             $mail->addReplyTo($contactData['email'], $contactData['first_name'] . ' ' . $contactData['last_name']);
-            $mail->addAddress(self::$from_email, 'Team MIRA');
+            $mail->addAddress(SMTP_USER, 'Team MIRA');
             $mail->isHTML(true);
             $mail->Subject = "[MIRA] Nuovo messaggio da {$contactData['first_name']} {$contactData['last_name']}";
             $mail->Body    = self::getContactNotificationHTML($contactData);
@@ -93,7 +108,7 @@ class EmailHelper {
             if ($result) error_log("✅ Contact notification inviata al team");
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             error_log("❌ Contact notification error: " . $e->getMessage());
             if ($mail instanceof PHPMailer) error_log("PHPMailer ErrorInfo: " . $mail->ErrorInfo);
             return false;
@@ -107,7 +122,7 @@ class EmailHelper {
         $mail = null;
         try {
             $mail = self::getMailer();
-            $mail->setFrom(self::$from_email, self::$from_name);
+            $mail->setFrom(SMTP_USER, self::$from_name);
             $mail->addAddress($contactData['email'], $contactData['first_name'] . ' ' . $contactData['last_name']);
             $mail->isHTML(true);
             $mail->Subject = 'Conferma Ricezione Messaggio - MIRA';
@@ -119,7 +134,7 @@ class EmailHelper {
             if ($result) error_log("✅ Contact confirmation inviata a: " . $contactData['email']);
             return $result;
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             error_log("❌ Contact confirmation error: " . $e->getMessage());
             if ($mail instanceof PHPMailer) error_log("PHPMailer ErrorInfo: " . $mail->ErrorInfo);
             return false;
@@ -131,6 +146,8 @@ class EmailHelper {
     // ========================================
 
     private static function getWelcomeEmailHTML($userName, $siteUrl) {
+        $userName = self::h($userName);
+        $siteUrl  = self::h($siteUrl);
         return "
 <!DOCTYPE html>
 <html>
@@ -193,6 +210,7 @@ class EmailHelper {
     }
 
     private static function getContactNotificationHTML($contactData) {
+        $contactData = self::escaped($contactData);
         $date = date('d/m/Y H:i:s');
         return "
 <!DOCTYPE html>
@@ -250,6 +268,8 @@ class EmailHelper {
     }
 
     private static function getContactConfirmationHTML($contactData, $siteUrl) {
+        $contactData = self::escaped($contactData);
+        $siteUrl     = self::h($siteUrl);
         return "
 <!DOCTYPE html>
 <html>
@@ -314,4 +334,3 @@ class EmailHelper {
             . "Cordiali saluti,\nTeam MIRA";
     }
 }
-?>
