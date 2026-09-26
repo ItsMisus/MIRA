@@ -215,7 +215,7 @@ function getProduct($db, $id) {
         $product['specs'][$spec['spec_key']] = $spec['spec_value'];
     }
 
-    $db->prepare("UPDATE products SET views = views + 1 WHERE id = ?")->execute([$id]);
+    countView($db, (int)$product['id']);
 
     Response::success($product);
 }
@@ -417,4 +417,19 @@ function createSlug($name, $db) {
     } while (true);
 
     return $slug;
+}
+
+/**
+ * Una visita per prodotto e per indirizzo ogni 30 minuti: ricaricare la
+ * pagina non deve gonfiare `views`, che decide l'ordinamento "popolari".
+ */
+function countView($db, $productId) {
+    $bucket = 'view:' . $productId . ':' . clientIp();
+    $recent = $db->prepare('SELECT 1 FROM rate_limits WHERE bucket = ? AND hit_at > (NOW() - INTERVAL 1800 SECOND) LIMIT 1');
+    $recent->execute([$bucket]);
+    if ($recent->fetch()) {
+        return;
+    }
+    $db->prepare('INSERT INTO rate_limits (bucket) VALUES (?)')->execute([$bucket]);
+    $db->prepare('UPDATE products SET views = views + 1 WHERE id = ?')->execute([$productId]);
 }

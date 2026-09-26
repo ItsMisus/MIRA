@@ -278,10 +278,12 @@ function requireAdmin($db) {
  * Serve la tabella rate_limits (database/migrations/001_sicurezza.sql).
  */
 function rateLimit($db, $bucket, $max, $seconds) {
-    $db->prepare('DELETE FROM rate_limits WHERE hit_at < (NOW() - INTERVAL ? SECOND)')
-       ->execute([(int)$seconds]);
-    $count = $db->prepare('SELECT COUNT(*) FROM rate_limits WHERE bucket = ?');
-    $count->execute([$bucket]);
+    // Pulizia con una soglia fissa (un giorno), piu' lunga di ogni finestra:
+    // con la finestra della chiamata, un login (15 minuti) cancellava anche i
+    // conteggi dei contatti (un'ora).
+    $db->exec('DELETE FROM rate_limits WHERE hit_at < (NOW() - INTERVAL 1 DAY)');
+    $count = $db->prepare('SELECT COUNT(*) FROM rate_limits WHERE bucket = ? AND hit_at > (NOW() - INTERVAL ? SECOND)');
+    $count->execute([$bucket, (int)$seconds]);
     if ((int)$count->fetchColumn() >= $max) {
         Response::error('Troppi tentativi, riprova più tardi', 429);
     }
