@@ -34,8 +34,12 @@ async function loadNovitaProducts() {
         const novitaProducts = data.data.products.filter(product => {
             const categoryName = (product.category_name || '').toLowerCase().trim();
             const categorySlug = (product.category_slug || '').toLowerCase().trim();
+            // Come il filtro del catalogo (pcgaming.html?category=novita): vale
+            // sia la categoria sia il tag "novita".
+            const tags = Array.isArray(product.tags) ? product.tags : [];
             return categoryName === 'novità' || categoryName === 'novita' ||
-                   categorySlug === 'novita' || categorySlug === 'novità';
+                   categorySlug === 'novita' || categorySlug === 'novità' ||
+                   tags.includes('novita');
         });
 
         console.log(`✅ ${novitaProducts.length} prodotti Novità trovati`);
