@@ -10,6 +10,7 @@
     <meta property="og:title" content="Contattaci - MIRA">
     <meta property="og:description" content="Contatta il team MIRA per preventivi, configurazioni personalizzate e assistenza.">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cart.css">
     <style>
         /* CONTACT PAGE STYLES */
         .contact-page {
@@ -309,46 +310,6 @@
         </div>
     </div>
 </header>
-<!-- Cart Overlay -->
-<div class="cart-overlay" id="cartOverlay"></div>
-
-<!-- Cart Sidebar -->
-<div class="cart-sidebar" id="cartSidebar">
-    <!-- Header -->
-    <div class="cart-header">
-        <h3>Carrello</h3>
-        <button class="cart-close" id="cartClose">✕</button>
-    </div>
-    
-    <!-- Free Shipping Banner -->
-    <div class="cart-free-shipping">
-        <p>✓ Hai diritto alla spedizione gratuita!</p>
-    </div>
-    
-    <!-- Cart Items -->
-    <div class="cart-content" id="cartContent">
-        <p class="cart-empty">Il tuo carrello è vuoto</p>
-    </div>
-    
-    <!-- Footer -->
-    <div class="cart-footer">
-        <p class="cart-footer-info">Imposte e spese di spedizione calcolate al momento del check-out</p>
-        <button class="cart-checkout-btn" type="button" disabled aria-disabled="true" title="Il checkout online non è ancora disponibile">
-            <span>Checkout</span>
-            <span class="cart-checkout-price">€0.00</span>
-        </button>
-    </div>
-</div>
-
-<!-- INCLUDI QUESTI SCRIPT PRIMA DELLA CHIUSURA </body> -->
-<link rel="stylesheet" href="css/cart.css">
-    <!-- Search Overlay -->
-    <div class="search-overlay" id="searchOverlay">
-        <div class="search-container">
-            <input type="text" placeholder="Cerca..." class="search-input" id="mainSearchInput">
-            <button class="search-close" id="searchClose">✕</button>
-        </div>
-    </div>
 
     <!-- CONTACT PAGE -->
     <main class="contact-page">
@@ -515,6 +476,7 @@
         </footer>
         
 <script src="js/config.js"></script>
+<script src="js/layout.js"></script>
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/script.js"></script>

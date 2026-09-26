@@ -49,11 +49,19 @@ switch ($method) {
  * Get all products with filters
  */
 function getProducts($db, $params) {
-    $page   = isset($params['page'])  ? max(1, (int)$params['page'])          : 1;
-    $limit  = isset($params['limit']) ? min(100, max(1, (int)$params['limit'])) : 100;
+    // Il pannello admin deve vedere anche i prodotti disattivati, o non li
+    // potrebbe piu' riattivare. Solo con un admin verificato nel database.
+    $adminView = !empty($params['admin']);
+    if ($adminView) {
+        requireAdmin($db);
+    }
+    $maxLimit = $adminView ? 1000 : 100;
+
+    $page   = isset($params['page'])  ? max(1, (int)$params['page'])                 : 1;
+    $limit  = isset($params['limit']) ? min($maxLimit, max(1, (int)$params['limit'])) : 100;
     $offset = ($page - 1) * $limit;
 
-    $where    = ['p.is_active = 1'];
+    $where    = $adminView ? ['1 = 1'] : ['p.is_active = 1'];
     $bindings = [];
 
     if (isset($params['category'])) {

@@ -58,6 +58,66 @@ class EmailHelper {
     }
 
     /**
+     * Ordine ricevuto: una copia al team, una al cliente. Nessun pagamento
+     * online: l'email dice che il team lo contattera'.
+     * $order: order_number, total, email, phone, address, notes,
+     *         lines = [[product_id, name, qty, unit, subtotal], ...]
+     */
+    public static function sendOrderNotifications($order) {
+        $rowsHtml = '';
+        $rowsText = '';
+        foreach ($order['lines'] as [, $name, $qty, $unit, $subtotal]) {
+            $rowsHtml .= '<tr><td>' . self::h($name) . '</td><td style="text-align:center">' . (int)$qty
+                       . '</td><td style="text-align:right">€' . number_format($subtotal, 2, ',', '.') . '</td></tr>';
+            $rowsText .= "- {$name} x{$qty}: €" . number_format($subtotal, 2, ',', '.') . "\n";
+        }
+        $number  = self::h($order['order_number']);
+        $total   = number_format($order['total'], 2, ',', '.');
+        $address = nl2br(self::h($order['address']));
+        $notes   = $order['notes'] !== '' ? '<p><strong>Note:</strong> ' . nl2br(self::h($order['notes'])) . '</p>' : '';
+
+        $table = "<table style='width:100%;border-collapse:collapse' cellpadding='6'>
+                    <tr style='background:#f3f4f6'><th align='left'>Prodotto</th><th>Qtà</th><th align='right'>Totale</th></tr>
+                    {$rowsHtml}
+                    <tr><td colspan='2'><strong>Totale</strong></td><td style='text-align:right'><strong>€{$total}</strong></td></tr>
+                  </table>";
+
+        $toCustomer = "<div style='font-family:Arial,sans-serif;max-width:600px;margin:0 auto'>
+            <h2>Ordine ricevuto: {$number}</h2>
+            <p>Grazie! Abbiamo ricevuto il tuo ordine. <strong>Non è stato addebitato nulla</strong>:
+               ti contatteremo a breve per il pagamento e i tempi di spedizione.</p>
+            {$table}
+            <p><strong>Spedizione a:</strong><br>{$address}</p>{$notes}
+            <p>Team MIRA</p></div>";
+
+        $toTeam = "<div style='font-family:Arial,sans-serif'>
+            <h2>Nuovo ordine {$number}</h2>
+            <p><strong>Cliente:</strong> " . self::h($order['email']) . " · " . self::h($order['phone']) . "</p>
+            {$table}
+            <p><strong>Spedizione:</strong><br>{$address}</p>{$notes}</div>";
+
+        $text = "Ordine {$order['order_number']}\n\n{$rowsText}\nTotale: €{$total}\n\nSpedizione:\n{$order['address']}\n";
+
+        foreach ([[SMTP_USER, "[MIRA] Nuovo ordine {$order['order_number']}", $toTeam],
+                  [$order['email'], "Ordine ricevuto {$order['order_number']} - MIRA", $toCustomer]] as [$to, $subject, $html]) {
+            if (!$to) continue;
+            $mail = null;
+            try {
+                $mail = self::getMailer();
+                $mail->setFrom(SMTP_USER, self::$from_name);
+                $mail->addAddress($to);
+                $mail->isHTML(true);
+                $mail->Subject = $subject;
+                $mail->Body    = $html;
+                $mail->AltBody = $text;
+                $mail->send();
+            } catch (\Throwable $e) {
+                error_log("Email ordine non inviata a $to: " . $e->getMessage());
+            }
+        }
+    }
+
+    /**
      * Invia email di benvenuto al nuovo utente
      */
     public static function sendWelcomeEmail($userEmail, $userName) {

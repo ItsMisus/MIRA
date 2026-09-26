@@ -55,6 +55,18 @@ function setupCartListeners() {
         overlay.addEventListener('click', closeCart);
     }
     
+    // Checkout: pagina a parte, raggiungibile solo con qualcosa nel carrello.
+    const checkoutBtn = document.getElementById('cartCheckoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            if (!localStorage.getItem('miraToken')) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            window.location.href = 'checkout.html';
+        });
+    }
+
     // Previeni chiusura quando si clicca dentro il carrello
     const sidebar = document.getElementById('cartSidebar');
     if (sidebar) {
@@ -123,7 +135,19 @@ async function loadCart() {
                 'Authorization': `Bearer ${token}`
             }
         });
-        
+
+        // Sessione scaduta o revocata (logout, cambio chiave): si esce davvero,
+        // invece di restare "loggati" con un token che il server rifiuta.
+        if (response.status === 401) {
+            localStorage.removeItem('miraToken');
+            localStorage.removeItem('miraUser');
+            if (window.MiraAPI) window.MiraAPI.token = null;
+            cartData = { items: [], total: 0, itemsCount: 0 };
+            renderCart();
+            updateCartBadge();
+            return;
+        }
+
         const data = await response.json();
         console.log('📦 Risposta server:', data);
         
@@ -438,6 +462,10 @@ function updateCartFooter(total) {
     const checkoutPrice = document.querySelector('.cart-checkout-price');
     if (checkoutPrice) {
         checkoutPrice.textContent = `€${total.toFixed(2)}`;
+    }
+    const checkoutBtn = document.getElementById('cartCheckoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.disabled = !(cartData.items && cartData.items.length > 0);
     }
 }
 

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - MIRA</title>
+    <meta name="description" content="Completa il tuo ordine MIRA.">
+    <meta name="robots" content="noindex">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="nav-container">
+            <div style="display: flex; align-items: center; gap: 32px;">
+                <a href="index.html" class="logo">MIRA</a>
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="pcgaming.html">PC</a></li>
+                        <li><a href="pcgaming.html">Offerte</a></li>
+                        <li><a href="https://discord.gg/NrdB2AmFYB">Discord</a></li>
+                        <li><a href="contattaci.html">Contattaci</a></li>
+                    </ul>
+                </nav>
+            </div>
+               <!-- Nav Actions -->
+        <div class="nav-actions">
+            <div class="language-selector">
+                <span>Italiano</span>
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                </svg>
+            </div>
+
+             <button class="icon-btn" id="accountBtn" aria-label="Account">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="searchBtn" aria-label="Cerca">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </button>
+
+            <button class="icon-btn" id="cartBtn" aria-label="Carrello">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+    <main class="checkout-page">
+        <div class="checkout-container">
+            <h1 class="checkout-title">Checkout</h1>
+            <p class="checkout-subtitle">Controlla il carrello e indica dove spedire. Nessun pagamento online: ti contattiamo noi per confermare l'ordine.</p>
+
+            <div id="checkoutAlert" role="alert" aria-live="assertive"></div>
+
+            <div class="checkout-grid" id="checkoutGrid">
+                <section class="checkout-card" aria-labelledby="shippingTitle">
+                    <h2 id="shippingTitle">Spedizione</h2>
+                    <form id="checkoutForm" novalidate>
+                        <div class="checkout-field">
+                            <label for="fullName">Nome e cognome *</label>
+                            <input type="text" id="fullName" name="full_name" autocomplete="name" maxlength="120" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="street">Indirizzo *</label>
+                            <input type="text" id="street" name="street" autocomplete="street-address" maxlength="255" placeholder="Via Roma 1" required>
+                        </div>
+                        <div class="checkout-row">
+                            <div class="checkout-field">
+                                <label for="postalCode">CAP *</label>
+                                <input type="text" id="postalCode" name="postal_code" autocomplete="postal-code" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" required>
+                            </div>
+                            <div class="checkout-field">
+                                <label for="city">Città *</label>
+                                <input type="text" id="city" name="city" autocomplete="address-level2" maxlength="100" required>
+                            </div>
+                            <div class="checkout-field">
+                                <label for="province">Provincia *</label>
+                                <input type="text" id="province" name="province" autocomplete="address-level1" maxlength="100" placeholder="MI" required>
+                            </div>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="phone">Telefono *</label>
+                            <input type="tel" id="phone" name="phone" autocomplete="tel" maxlength="20" required>
+                        </div>
+                        <div class="checkout-field">
+                            <label for="notes">Note per l'ordine</label>
+                            <textarea id="notes" name="notes" maxlength="1000" placeholder="Orari di consegna, richieste particolari..."></textarea>
+                        </div>
+                    </form>
+                </section>
+
+                <aside class="checkout-card checkout-summary" aria-labelledby="summaryTitle">
+                    <h2 id="summaryTitle">Riepilogo</h2>
+                    <ul class="checkout-summary-list" id="checkoutItems">
+                        <li>Caricamento...</li>
+                    </ul>
+                    <div class="checkout-total"><span>Totale</span><span id="checkoutTotal">€0,00</span></div>
+                    <p class="checkout-note">Spedizione gratuita. Il pagamento non avviene ora: dopo l'ordine ti scriviamo per confermare disponibilità, pagamento e tempi di consegna.</p>
+                    <button type="submit" form="checkoutForm" class="checkout-submit" id="checkoutSubmit" disabled>Invia ordine</button>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>Supporto Clienti</h4>
+                    <ul>
+                        <li><a href="contattaci.html">Contattaci & FAQ</a></li>
+                        <li><a href="mailto:preventivimira1@gmail.com">preventivimira1@gmail.com</a></li>
+                        <li><a href="tel:+393775900298">+39 377 590 0298</a></li>
+                        <li><a href="auth.html">Il tuo Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>About MIRA</h4>
+                    <ul>
+                        <li><a href="#">Chi siamo</a></li>
+                        <li><a href="#">Leggi le recensioni</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://discord.gg/NrdB2AmFYB">Discord</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column footer-brand">
+                    <h4>Creato con il 💜 per il gioco</h4>
+                    <p>Da MIRA rendiamo il gaming su PC semplice e alla portata di tutti.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 - MIRA</p>
+            </div>
+        </div>
+        </footer>
+
+<script src="js/config.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/api.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/script.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/checkout.js"></script>
+</body>
+</html>

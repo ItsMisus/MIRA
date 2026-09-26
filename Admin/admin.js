@@ -121,6 +121,16 @@ async function apiRequest(endpoint, options = {}) {
         
         console.log('📦 API Response:', data);
         
+        // Sessione scaduta/revocata o ruolo admin tolto: si torna al login
+        // (i messaggi del server non contengono "401", va guardato lo stato).
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('miraToken');
+            localStorage.removeItem('miraUser');
+            alert('⚠️ Sessione non valida o permessi insufficienti. Effettua nuovamente il login.');
+            window.location.href = '../auth.html';
+            throw new Error(data.message || `HTTP ${response.status}`);
+        }
+
         // Gestione errori API
         if (!data.success) {
             throw new Error(data.message || 'Errore sconosciuto');
@@ -130,12 +140,6 @@ async function apiRequest(endpoint, options = {}) {
         
     } catch (error) {
         console.error('❌ API Error:', error);
-        
-        // Se token scaduto, redirect al login
-        if (error.message && (error.message.includes('Token') || error.message.includes('401'))) {
-            alert('⚠️ Sessione scaduta. Effettua nuovamente il login.');
-            logout();
-        }
         
         throw error;
     }
@@ -152,7 +156,7 @@ async function loadProducts() {
         
         // Chiamata diretta con fetch per avere più controllo
         const token = localStorage.getItem('miraToken');
-        const response = await fetch(`${API_BASE}/products.php?limit=1000`, {
+        const response = await fetch(`${API_BASE}/products.php?limit=1000&admin=1`, {
             headers: {
                 'Content-Type': 'application/json',
                 ...(token && { 'Authorization': `Bearer ${token}` })
