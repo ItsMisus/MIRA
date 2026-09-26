@@ -6,7 +6,7 @@
 // ============================================================================
 // CONFIGURAZIONE
 // ============================================================================
-const API_BASE = 'http://localhost/mira_ecommerce/api';
+const API_BASE = window.MIRA_API;
 
 // ============================================================================
 // STATE MANAGEMENT
@@ -58,7 +58,8 @@ function checkAdminAuth() {
         const userData = JSON.parse(user);
         
         // Verifica permessi admin
-        if (!userData.is_admin && userData.email !== 'francminu08@gmail.com') {
+        // Solo un controllo di interfaccia: i permessi veri li verifica il server.
+        if (!userData.is_admin) {
             alert('⚠️ Non hai i permessi necessari per accedere al pannello admin');
             window.location.href = '../index.html';
             return;
@@ -346,19 +347,19 @@ function renderProducts() {
         
         row.innerHTML = `
             <td>
-                <input type="checkbox" class="product-checkbox" data-id="${product.id}">
+                <input type="checkbox" class="product-checkbox" data-id="${Number(product.id)}" aria-label="Seleziona ${esc(product.name)}">
             </td>
             <td>
                 <div class="product-image-cell">
-                    <img src="${product.image_url}" alt="${product.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22%3E%3Crect fill=%22%23e5e7eb%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2212%22 fill=%22%239ca3af%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+                    <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}">
                 </div>
             </td>
-            <td><strong>${product.name}</strong></td>
-            <td>${product.category_name || '-'}</td>
+            <td><strong>${esc(product.name)}</strong></td>
+            <td>${esc(product.category_name || '-')}</td>
             <td>${priceDisplay}</td>
             <td>
                 <span class="badge ${product.stock > 10 ? 'badge-success' : 'badge-warning'}">
-                    ${product.stock} unità
+                    ${Number(product.stock) || 0} unità
                 </span>
             </td>
             <td>
@@ -368,12 +369,12 @@ function renderProducts() {
             </td>
             <td>
                 <div class="table-actions">
-                    <button class="btn-icon" onclick="editProduct(${product.id})" title="Modifica">
+                    <button class="btn-icon" type="button" data-action="edit" title="Modifica" aria-label="Modifica ${esc(product.name)}">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
                         </svg>
                     </button>
-                    <button class="btn-icon danger" onclick="deleteProduct(${product.id})" title="Elimina">
+                    <button class="btn-icon danger" type="button" data-action="delete" title="Elimina" aria-label="Elimina ${esc(product.name)}">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                             <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                             <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
@@ -382,7 +383,9 @@ function renderProducts() {
                 </div>
             </td>
         `;
-        
+
+        row.querySelector('[data-action="edit"]').addEventListener('click', () => editProduct(product.id));
+        row.querySelector('[data-action="delete"]').addEventListener('click', () => deleteProduct(product.id));
         tbody.appendChild(row);
     });
     
@@ -654,14 +657,15 @@ function addSpecificationRow(key = '', value = '') {
     const row = document.createElement('div');
     row.className = 'spec-row';
     row.innerHTML = `
-        <input type="text" class="spec-key" placeholder="Nome (es: CPU)" value="${key}">
-        <input type="text" class="spec-value" placeholder="Valore (es: Intel i7)" value="${value}">
-        <button type="button" class="btn-remove-spec" onclick="this.parentElement.remove()">
+        <input type="text" class="spec-key" placeholder="Nome (es: CPU)" value="${esc(key)}" aria-label="Nome specifica">
+        <input type="text" class="spec-value" placeholder="Valore (es: Intel i7)" value="${esc(value)}" aria-label="Valore specifica">
+        <button type="button" class="btn-remove-spec" aria-label="Rimuovi specifica">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
             </svg>
         </button>
     `;
+    row.querySelector('.btn-remove-spec').addEventListener('click', () => row.remove());
     container.appendChild(row);
 }
 
@@ -690,7 +694,7 @@ function populateCategorySelects() {
     
     select.innerHTML = '<option value="">-- Seleziona Categoria --</option>';
     currentCategories.forEach(cat => {
-        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+        select.add(new Option(cat.name, cat.id));
     });
 }
 
@@ -700,7 +704,7 @@ function populateCategoryFilter() {
     
     select.innerHTML = '<option value="">Tutte le categorie</option>';
     currentCategories.forEach(cat => {
-        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+        select.add(new Option(cat.name, cat.id));
     });
 }
 

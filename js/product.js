@@ -3,7 +3,7 @@
  * FIX #13: filtri catalogo usano sia tags che category_slug per matching robusto
  */
 
-const PRODUCTS_API = 'http://localhost/mira_ecommerce/api/products.php';
+const PRODUCTS_API = window.MIRA_API + '/products.php';
 let currentProduct = null;
 
 // ============================================================================
@@ -32,7 +32,7 @@ async function initProductDetailPage() {
     }
 
     try {
-        const response = await fetch(`${PRODUCTS_API}?id=${productId}`);
+        const response = await fetch(`${PRODUCTS_API}?id=${encodeURIComponent(productId)}`);
         const data     = await response.json();
 
         if (!data.success || !data.data) {
@@ -62,12 +62,12 @@ function renderProductDetail(product) {
         <div class="product-detail-container">
             <div class="product-detail-images">
                 <div class="main-image">
-                    <img src="${product.image_url}" alt="${product.name}">
+                    <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}">
                 </div>
             </div>
 
             <div class="product-detail-info">
-                <h1>${product.name}</h1>
+                <h1>${esc(product.name)}</h1>
 
                 <div class="product-rating-detail">
                     ${renderStars(product.avg_rating)}
@@ -77,7 +77,7 @@ function renderProductDetail(product) {
                     </span>
                 </div>
 
-                <p class="product-detail-desc">${product.description}</p>
+                <p class="product-detail-desc">${esc(product.description)}</p>
 
                 ${renderSpecs(product.specs)}
 
@@ -89,7 +89,7 @@ function renderProductDetail(product) {
                     }
                 </div>
 
-                <button class="btn-add-to-cart-detail" onclick="handleAddToCart(${product.id})">
+                <button class="btn-add-to-cart-detail" type="button">
                     Aggiungi al carrello
                 </button>
 
@@ -97,6 +97,16 @@ function renderProductDetail(product) {
             </div>
         </div>
     `;
+
+    container.querySelector('.btn-add-to-cart-detail')
+        .addEventListener('click', () => handleAddToCart(product.id));
+
+    // Titolo e descrizione della pagina: per i motori di ricerca e per la scheda del browser.
+    document.title = `${product.name} - MIRA`;
+    const description = document.querySelector('meta[name="description"]');
+    if (description) {
+        description.setAttribute('content', String(product.description || '').slice(0, 155));
+    }
 }
 
 // ============================================================================
@@ -107,7 +117,7 @@ function renderSpecs(specs) {
 
     const specsHTML = Object.entries(specs).map(([key, value]) => `
         <div class="spec-item">
-            <strong>${key.toUpperCase()}:</strong> ${value}
+            <strong>${esc(key.toUpperCase())}:</strong> ${esc(value)}
         </div>
     `).join('');
 
@@ -222,14 +232,14 @@ async function initPCGamingPage() {
         card.innerHTML = `
             ${product.is_discount ? '<span class="discount-badge">OFFERTA</span>' : ''}
             <div class="product-image">
-                <img src="${product.image_url}" alt="${product.name}">
+                <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}" loading="lazy">
             </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+                <h3>${esc(product.name)}</h3>
+                <p class="product-desc">${esc((product.description || '').substring(0, 80))}...</p>
                 <div class="product-rating">
                     ${renderStars(product.avg_rating)}
-                    <span class="rating-count">(${product.review_count})</span>
+                    <span class="rating-count">(${Number(product.review_count) || 0})</span>
                 </div>
                 <div class="product-price">
                     ${product.is_discount
@@ -241,10 +251,7 @@ async function initPCGamingPage() {
             </div>
         `;
 
-        card.addEventListener('click', () => {
-            window.location.href = `product.html?id=${product.id}`;
-        });
-
+        makeCardLink(card, product);
         return card;
     }
 

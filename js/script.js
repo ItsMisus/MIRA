@@ -35,13 +35,13 @@ function initCart() {
                 div.style.cssText = 'display:flex; gap:10px; margin-bottom:15px; background:#222; padding:10px; border-radius:8px; align-items:flex-start;';
 
                 div.innerHTML = `
-                    <img src="${item.img}" alt="${item.name}" style="width:80px; height:60px; object-fit:cover; border-radius:6px;">
+                    <img src="${esc(safeUrl(item.img))}" alt="${esc(item.name)}" style="width:80px; height:60px; object-fit:cover; border-radius:6px;">
                     <div style="flex:1;">
-                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#fff;">${item.name}</h4>
-                        <p style="font-size:0.85rem; color:#ccc; margin:3px 0;">€ ${item.price.toFixed(2)}</p>
+                        <h4 style="margin:0 0 5px 0; font-size:0.95rem; color:#fff;">${esc(item.name)}</h4>
+                        <p style="font-size:0.85rem; color:#ccc; margin:3px 0;">€ ${Number(item.price).toFixed(2)}</p>
                         <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
                             <button class="decrease" style="background:#9b59b6; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600;">−</button>
-                            <span style="min-width:20px; text-align:center; font-weight:600; color:#9b59b6;">${item.qty}</span>
+                            <span style="min-width:20px; text-align:center; font-weight:600; color:#9b59b6;">${Number(item.qty) || 0}</span>
                             <button class="increase" style="background:#9b59b6; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600;">+</button>
                             <button class="remove" style="background:#e74c3c; border:none; color:#fff; padding:4px 8px; cursor:pointer; border-radius:4px; font-weight:600; margin-left:auto;">✕</button>
                         </div>
@@ -122,8 +122,7 @@ async function performSearch(query) {
     if (!query) return;
 
     try {
-        const API_BASE = 'http://localhost/mira_ecommerce/api';
-        const response = await fetch(`${API_BASE}/products.php?search=${encodeURIComponent(query)}&limit=100`);
+        const response = await fetch(`${window.MIRA_API}/products.php?search=${encodeURIComponent(query)}&limit=100`);
         const data = await response.json();
 
         const results = (data.success && data.data && data.data.products) ? data.data.products : [];
@@ -298,7 +297,7 @@ if (window.location.pathname.includes('risultati.html')) {
 
             if (!searchQuery || searchResults.length === 0) {
                 // Mostra messaggio invece di redirect immediato
-                resultsContainer.innerHTML = `<p style="text-align:center;color:#999;padding:40px;">Nessun risultato trovato per "<strong>${searchQuery}</strong>"</p>`;
+                resultsContainer.innerHTML = `<p style="text-align:center;color:#999;padding:40px;">Nessun risultato trovato per "<strong>${esc(searchQuery)}</strong>"</p>`;
                 const pageTitle = document.querySelector('.page-title, h1');
                 if (pageTitle) pageTitle.textContent = `Risultati per "${searchQuery}"`;
                 return;
@@ -326,16 +325,16 @@ if (window.location.pathname.includes('risultati.html')) {
                     card.innerHTML = `
                         ${product.is_discount ? '<span class="discount-badge">OFFERTA</span>' : ''}
                         <div class="product-image">
-                            <img src="${product.image_url}" alt="${product.name}">
+                            <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}" loading="lazy">
                         </div>
                         <div class="product-info">
-                            <h3>${product.name}</h3>
-                            <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+                            <h3>${esc(product.name)}</h3>
+                            <p class="product-desc">${esc((product.description || '').substring(0, 80))}...</p>
                             <div class="product-rating">
                                 <div class="stars">
                                     ${[1,2,3,4,5].map(s => `<span class="star ${s <= Math.round(avgRating) ? 'filled' : ''}">★</span>`).join('')}
                                 </div>
-                                <span class="rating-count">(${reviewCount})</span>
+                                <span class="rating-count">(${Number(reviewCount) || 0})</span>
                             </div>
                             <div class="product-price">
                                 ${product.is_discount
@@ -346,7 +345,7 @@ if (window.location.pathname.includes('risultati.html')) {
                             </div>
                         </div>
                     `;
-                    card.addEventListener('click', () => { window.location.href = `product.html?id=${product.id}`; });
+                    makeCardLink(card, product);
                     resultsContainer.appendChild(card);
                 });
 

@@ -88,8 +88,8 @@ function initAuthPage() {
             const submitBtn = registerForm.querySelector('button[type="submit"]');
             
             // Validation
-            if (password.length < 6) {
-                showAlert('La password deve essere di almeno 6 caratteri', 'error');
+            if (password.length < 10) {
+                showAlert('La password deve essere di almeno 10 caratteri', 'error');
                 return;
             }
             
@@ -267,8 +267,8 @@ function showAlert(message, type) {
     const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
     
     alertContainer.innerHTML = `
-        <div class="alert ${alertClass}">
-            ${message}
+        <div class="alert ${alertClass}" role="alert">
+            ${esc(message)}
         </div>
     `;
     

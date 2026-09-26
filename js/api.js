@@ -3,7 +3,7 @@
  * FIX #10: sincronizzazione carrello eseguita una sola volta con _cartSyncDone flag
  */
 
-const API_BASE_URL = 'http://localhost/mira_ecommerce/api';
+const API_BASE_URL = window.MIRA_API;
 
 // ==================== API CLIENT CLASS ====================
 class MiraAPI {
@@ -43,11 +43,11 @@ class MiraAPI {
     }
 
     async getProduct(id) {
-        return this.request(`products.php?id=${id}`);
+        return this.request(`products.php?id=${encodeURIComponent(id)}`);
     }
 
     async getProductBySlug(slug) {
-        return this.request(`products.php?slug=${slug}`);
+        return this.request(`products.php?slug=${encodeURIComponent(slug)}`);
     }
 
     async searchProducts(query, filters = {}) {
@@ -57,7 +57,7 @@ class MiraAPI {
     // ==================== REVIEWS ====================
 
     async getReviews(productId) {
-        return this.request(`reviews.php?product_id=${productId}`);
+        return this.request(`reviews.php?product_id=${encodeURIComponent(productId)}`);
     }
 
     async submitReview(productId, data) {
@@ -140,6 +140,16 @@ class MiraAPI {
     }
 
     logout() {
+        // Il server invalida il token (token_version): senza, restava valido
+        // fino alla scadenza anche dopo l'uscita.
+        if (this.token) {
+            fetch(`${this.baseURL}/auth.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}` },
+                body: JSON.stringify({ action: 'logout' }),
+                keepalive: true
+            }).catch(() => {});
+        }
         this.token = null;
         localStorage.removeItem('miraToken');
         localStorage.removeItem('miraUser');
@@ -180,18 +190,18 @@ function createProductCard(product) {
     card.innerHTML = `
         ${hasDiscount ? '<span class="discount-badge">OFFERTA</span>' : ''}
         <div class="product-image">
-            <img src="${product.image_url}" alt="${product.name}" loading="lazy">
+            <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}" loading="lazy">
         </div>
         <div class="product-info">
-            <h3>${product.name}</h3>
-            <p class="product-desc">${(product.description || '').substring(0, 80)}...</p>
+            <h3>${esc(product.name)}</h3>
+            <p class="product-desc">${esc((product.description || '').substring(0, 80))}...</p>
             <div class="product-rating">
                 <div class="stars">
                     ${[1,2,3,4,5].map(s =>
                         `<span class="star ${s <= Math.round(product.avg_rating) ? 'filled' : ''}">★</span>`
                     ).join('')}
                 </div>
-                <span class="rating-count">(${product.review_count})</span>
+                <span class="rating-count">(${Number(product.review_count) || 0})</span>
             </div>
             <div class="product-price">
                 ${hasDiscount
@@ -203,10 +213,7 @@ function createProductCard(product) {
         </div>
     `;
 
-    card.addEventListener('click', () => {
-        window.location.href = `product.html?id=${product.id}`;
-    });
-
+    makeCardLink(card, product);
     return card;
 }
 

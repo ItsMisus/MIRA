@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MIRA Admin Panel</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
     <!-- Toast Notification -->
-    <div id="toast" class="toast">
+    <div id="toast" role="status" aria-live="polite" class="toast">
         <div class="toast-icon"></div>
         <div class="toast-message"></div>
     </div>
@@ -247,7 +248,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/api.js"></script>
+    <script src="../js/config.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contattaci - MIRA</title>
+    <meta name="description" content="Contatta il team MIRA per preventivi, configurazioni personalizzate e assistenza.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MIRA">
+    <meta property="og:title" content="Contattaci - MIRA">
+    <meta property="og:description" content="Contatta il team MIRA per preventivi, configurazioni personalizzate e assistenza.">
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* CONTACT PAGE STYLES */
@@ -328,7 +333,7 @@
     <!-- Footer -->
     <div class="cart-footer">
         <p class="cart-footer-info">Imposte e spese di spedizione calcolate al momento del check-out</p>
-        <button class="cart-checkout-btn" onclick="window.location.href='checkout.html'">
+        <button class="cart-checkout-btn" type="button" disabled aria-disabled="true" title="Il checkout online non è ancora disponibile">
             <span>Checkout</span>
             <span class="cart-checkout-price">€0.00</span>
         </button>
@@ -337,7 +342,6 @@
 
 <!-- INCLUDI QUESTI SCRIPT PRIMA DELLA CHIUSURA </body> -->
 <link rel="stylesheet" href="css/cart.css">
-<script src="js/cart.js"></script>
     <!-- Search Overlay -->
     <div class="search-overlay" id="searchOverlay">
         <div class="search-container">
@@ -510,6 +514,7 @@
         </div>
         </footer>
         
+<script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/script.js"></script>

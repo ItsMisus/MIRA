@@ -6,8 +6,7 @@
 // ============================================================================
 // CONFIGURAZIONE
 // ============================================================================
-const CART_API = 'http://localhost/mira_ecommerce/api/cart.php';
-const PRODUCTS_API = 'http://localhost/mira_ecommerce/api/products.php';
+const CART_API = window.MIRA_API + '/cart.php';
 
 // ============================================================================
 // STATO CARRELLO
@@ -387,15 +386,13 @@ function createCartItem(item) {
     div.innerHTML = `
         <div class="cart-item-top">
             <div class="cart-item-image">
-                <img src="${item.image_url}" 
-                     alt="${item.product_name}"
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
+                <img src="${esc(safeUrl(item.image_url))}" alt="${esc(item.product_name)}">
             </div>
             <div class="cart-item-info">
-                <h4 class="cart-item-name">${item.product_name}</h4>
+                <h4 class="cart-item-name">${esc(item.product_name)}</h4>
                 <p class="cart-item-variant">€${parseFloat(item.unit_price).toFixed(2)}</p>
             </div>
-            <button class="cart-item-close" onclick="removeFromCart(${item.item_id})" title="Rimuovi">
+            <button class="cart-item-close" type="button" data-action="remove" title="Rimuovi" aria-label="Rimuovi ${esc(item.product_name)}">
                 ✕
             </button>
         </div>
@@ -409,20 +406,28 @@ function createCartItem(item) {
         
         <div class="cart-item-actions">
             <div class="quantity-controls">
-                <button class="quantity-btn" onclick="updateQuantity(${item.item_id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
+                <button class="quantity-btn" type="button" data-action="decrease" aria-label="Diminuisci quantità" ${item.quantity <= 1 ? 'disabled' : ''}>
                     −
                 </button>
-                <span class="quantity-value">${item.quantity}</span>
-                <button class="quantity-btn" onclick="updateQuantity(${item.item_id}, ${item.quantity + 1})">
+                <span class="quantity-value">${Number(item.quantity) || 0}</span>
+                <button class="quantity-btn" type="button" data-action="increase" aria-label="Aumenta quantità">
                     +
                 </button>
             </div>
-            <button class="cart-item-remove" onclick="removeFromCart(${item.item_id})">
+            <button class="cart-item-remove" type="button" data-action="remove">
                 Rimuovi
             </button>
         </div>
     `;
-    
+
+    // Niente onclick nel markup: la CSP del sito blocca il JavaScript inline.
+    div.querySelectorAll('[data-action="remove"]').forEach(btn =>
+        btn.addEventListener('click', () => removeFromCart(item.item_id)));
+    div.querySelector('[data-action="decrease"]')
+        .addEventListener('click', () => updateQuantity(item.item_id, item.quantity - 1));
+    div.querySelector('[data-action="increase"]')
+        .addEventListener('click', () => updateQuantity(item.item_id, item.quantity + 1));
+
     return div;
 }
 

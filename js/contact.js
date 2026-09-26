@@ -150,12 +150,10 @@ function showAlert(message, type) {
     const alertClass = type === 'success' ? 'alert-success' : 'alert-error';
     
     formAlert.innerHTML = `
-        <div class="alert ${alertClass} show">
-            ${message}
+        <div class="alert ${alertClass} show" role="alert">
+            ${esc(message)}
         </div>
     `;
-    
-    console.log('Alert mostrato:', type, message);
     
     // Auto-hide dopo 5 secondi (solo per errori)
     if (type === 'error') {

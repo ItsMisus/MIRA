@@ -3,7 +3,7 @@
  * FIX #12: larghezza card letta dal DOM dinamicamente, non hardcodata a 300px
  */
 
-const API_BASE = 'http://localhost/mira_ecommerce/api';
+const NOVITA_API = window.MIRA_API;
 
 // ============================================================================
 // CARICAMENTO PRODOTTI NOVITÀ
@@ -24,7 +24,7 @@ async function loadNovitaProducts() {
     `;
 
     try {
-        const response = await fetch(`${API_BASE}/products.php?limit=100`);
+        const response = await fetch(`${NOVITA_API}/products.php?limit=100`);
         const data     = await response.json();
 
         if (!data.success || !data.data || !data.data.products) {
@@ -107,15 +107,13 @@ function createProductCard(product) {
     card.className = 'product-card-nzxt';
 
     card.innerHTML = `
-        <a href="product.html?id=${product.id}" class="product-link">
+        <a href="product.html?id=${encodeURIComponent(product.id)}" class="product-link">
             <div class="product-image-nzxt">
-                <img src="${product.image_url}"
-                     alt="${product.name}"
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22400%22/%3E%3C/svg%3E'">
+                <img src="${esc(safeUrl(product.image_url))}" alt="${esc(product.name)}" loading="lazy">
             </div>
             <div class="product-info-nzxt">
-                <h3 class="product-name-nzxt">${product.name}</h3>
-                <p class="product-desc-nzxt">${product.description ? product.description.substring(0, 60) + '...' : ''}</p>
+                <h3 class="product-name-nzxt">${esc(product.name)}</h3>
+                <p class="product-desc-nzxt">${product.description ? esc(product.description.substring(0, 60)) + '...' : ''}</p>
             </div>
         </a>
     `;

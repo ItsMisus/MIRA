@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MIRA - PC Gaming di Alta Qualità</title>
+    <meta name="description" content="PC gaming assemblati e componenti di alta qualità: configurazioni pronte, offerte e novità.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MIRA">
+    <meta property="og:title" content="MIRA - PC Gaming di Alta Qualità">
+    <meta property="og:description" content="PC gaming assemblati e componenti di alta qualità: configurazioni pronte, offerte e novità.">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -99,7 +104,7 @@
     <!-- Footer -->
     <div class="cart-footer">
         <p class="cart-footer-info">Imposte e spese di spedizione calcolate al momento del check-out</p>
-        <button class="cart-checkout-btn" onclick="window.location.href='checkout.html'">
+        <button class="cart-checkout-btn" type="button" disabled aria-disabled="true" title="Il checkout online non è ancora disponibile">
             <span>Checkout</span>
             <span class="cart-checkout-price">€0.00</span>
         </button>
@@ -108,7 +113,6 @@
 
 <!-- AGGIUNGI QUESTI SCRIPT PRIMA DELLA CHIUSURA </body> -->
 <link rel="stylesheet" href="css/cart.css">
-<script src="js/cart.js"></script>
 
 <!-- CSS AGGIUNTIVO PER IL BADGE -->
 <style>
@@ -275,6 +279,7 @@
     </footer>
 
     <!-- Scripts nell'ORDINE CORRETTO -->
+<script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/script.js"></script>

@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prodotto - MIRA</title>
+    <meta name="description" content="Scheda prodotto MIRA: specifiche tecniche, prezzo e disponibilità.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="MIRA">
+    <meta property="og:title" content="Prodotto - MIRA">
+    <meta property="og:description" content="Scheda prodotto MIRA: specifiche tecniche, prezzo e disponibilità.">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/product-page.css">
 </head>
@@ -86,7 +91,7 @@
     <!-- Footer -->
     <div class="cart-footer">
         <p class="cart-footer-info">Imposte e spese di spedizione calcolate al momento del check-out</p>
-        <button class="cart-checkout-btn" onclick="window.location.href='checkout.html'">
+        <button class="cart-checkout-btn" type="button" disabled aria-disabled="true" title="Il checkout online non è ancora disponibile">
             <span>Checkout</span>
             <span class="cart-checkout-price">€0.00</span>
         </button>
@@ -95,7 +100,6 @@
 
 <!-- INCLUDI QUESTI SCRIPT PRIMA DELLA CHIUSURA </body> -->
 <link rel="stylesheet" href="css/cart.css">
-<script src="js/cart.js"></script>
     <!-- Product Page -->
     <main class="product-page">
         <!-- Breadcrumb -->
@@ -181,6 +185,7 @@
         </div>
     </footer>
 
+<script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/script.js"></script>
